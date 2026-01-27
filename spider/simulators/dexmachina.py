@@ -92,6 +92,8 @@ def setup_env(config: Config, ref_data: tuple[torch.Tensor, ...]) -> BaseEnv:
         env_kwargs["env_cfg"]["scene_kwargs"]["n_rendered_envs"] = 4
         env_kwargs["env_cfg"]["env_spacing"] = (0.0, 0.0)
 
+    # breakpoint()
+
     env = BaseEnv(**env_kwargs)
     env._recording = False  # disable recording since we will do shooting
     env.reset()
@@ -306,14 +308,17 @@ def get_imitation_reward(
 ) -> torch.Tensor:
     """Get the imitation reward based on keypoint and wrist tracking."""
     # Get keypoint positions
-    kpts_left = env.robots["left"].kpt_pos
+    # kpts_left = env.robots["left"].kpt_pos
     kpts_right = env.robots["right"].kpt_pos
-    wrist_pose_left = env.robots["left"].wrist_pose
+    # wrist_pose_left = env.robots["left"].wrist_pose
     wrist_pose_right = env.robots["right"].wrist_pose
 
     # Compute fingertip distances
-    fingertip_dist_left = get_keypoint_dist(env, kpts_left, left_hand=True)
+    # fingertip_dist_left = get_keypoint_dist(env, kpts_left, left_hand=True)
+
     fingertip_dist_right = get_keypoint_dist(env, kpts_right, left_hand=False)
+    fingertip_dist_left = torch.zeros_like(fingertip_dist_right)
+
     fingertip_dist = torch.mean(
         (fingertip_dist_left + fingertip_dist_right) / 2.0, dim=-1
     )  # (B, num_links) -> (B,)
@@ -536,9 +541,9 @@ def get_trace(config: Config, env: BaseEnv) -> torch.Tensor:
     Returns shape (N, num_trace_points, 3)
     """
     # Get finger tip positions
-    left_finger_tip_pos = env.robots["left"].entity.get_links_pos()[
-        :, env.robots["left"].kpt_link_idxs, :
-    ]
+    # left_finger_tip_pos = env.robots["left"].entity.get_links_pos()[
+    #     :, env.robots["left"].kpt_link_idxs, :
+    # ]
     right_finger_tip_pos = env.robots["right"].entity.get_links_pos()[
         :, env.robots["right"].kpt_link_idxs, :
     ]
@@ -546,8 +551,12 @@ def get_trace(config: Config, env: BaseEnv) -> torch.Tensor:
     obj_pos = env.objects[env.object_names[0]].entity.get_pos()
     obj_link_pos = env.objects[env.object_names[0]].entity.get_links_pos()
     # Concatenate trace points
+    # trace = torch.cat(
+    #     [obj_pos.unsqueeze(1), obj_link_pos, left_finger_tip_pos, right_finger_tip_pos],
+    #     dim=1,
+    # )
     trace = torch.cat(
-        [obj_pos.unsqueeze(1), obj_link_pos, left_finger_tip_pos, right_finger_tip_pos],
+        [obj_pos.unsqueeze(1), obj_link_pos, right_finger_tip_pos],
         dim=1,
     )
     return trace
@@ -656,26 +665,26 @@ def copy_sample_state(
 
     # Get all entities dof positions and velocities
     obj_dofs_pos = env.objects[env.object_names[0]].entity.get_dofs_position()
-    left_hand_dofs_pos = env.robots["left"].entity.get_dofs_position()
+    # left_hand_dofs_pos = env.robots["left"].entity.get_dofs_position()
     right_hand_dofs_pos = env.robots["right"].entity.get_dofs_position()
     obj_dofs_vel = env.objects[env.object_names[0]].entity.get_dofs_velocity()
-    left_hand_dofs_vel = env.robots["left"].entity.get_dofs_velocity()
+    # left_hand_dofs_vel = env.robots["left"].entity.get_dofs_velocity()
     right_hand_dofs_vel = env.robots["right"].entity.get_dofs_velocity()
 
     # Copy from src to dst
     obj_dofs_pos[dst_idx] = obj_dofs_pos[src_idx]
-    left_hand_dofs_pos[dst_idx] = left_hand_dofs_pos[src_idx]
+    # left_hand_dofs_pos[dst_idx] = left_hand_dofs_pos[src_idx]
     right_hand_dofs_pos[dst_idx] = right_hand_dofs_pos[src_idx]
     obj_dofs_vel[dst_idx] = obj_dofs_vel[src_idx]
-    left_hand_dofs_vel[dst_idx] = left_hand_dofs_vel[src_idx]
+    # left_hand_dofs_vel[dst_idx] = left_hand_dofs_vel[src_idx]
     right_hand_dofs_vel[dst_idx] = right_hand_dofs_vel[src_idx]
 
     # Set all entities dof positions and velocities
     env.objects[env.object_names[0]].entity.set_dofs_position(obj_dofs_pos)
-    env.robots["left"].entity.set_dofs_position(left_hand_dofs_pos)
+    # env.robots["left"].entity.set_dofs_position(left_hand_dofs_pos)
     env.robots["right"].entity.set_dofs_position(right_hand_dofs_pos)
     env.objects[env.object_names[0]].entity.set_dofs_velocity(obj_dofs_vel)
-    env.robots["left"].entity.set_dofs_velocity(left_hand_dofs_vel)
+    # env.robots["left"].entity.set_dofs_velocity(left_hand_dofs_vel)
     env.robots["right"].entity.set_dofs_velocity(right_hand_dofs_vel)
 
 
@@ -686,26 +695,26 @@ def sync_env(config: Config, env: BaseEnv, mj_data=None):
     """
     # Get all entities dof positions and velocities
     obj_dofs_pos = env.objects[env.object_names[0]].entity.get_dofs_position()
-    left_hand_dofs_pos = env.robots["left"].entity.get_dofs_position()
+    # left_hand_dofs_pos = env.robots["left"].entity.get_dofs_position()
     right_hand_dofs_pos = env.robots["right"].entity.get_dofs_position()
     obj_dofs_vel = env.objects[env.object_names[0]].entity.get_dofs_velocity()
-    left_hand_dofs_vel = env.robots["left"].entity.get_dofs_velocity()
+    # left_hand_dofs_vel = env.robots["left"].entity.get_dofs_velocity()
     right_hand_dofs_vel = env.robots["right"].entity.get_dofs_velocity()
 
     # Broadcast to all envs
     obj_dofs_pos = obj_dofs_pos[:1].repeat(int(config.num_samples), 1)
-    left_hand_dofs_pos = left_hand_dofs_pos[:1].repeat(int(config.num_samples), 1)
+    # left_hand_dofs_pos = left_hand_dofs_pos[:1].repeat(int(config.num_samples), 1)
     right_hand_dofs_pos = right_hand_dofs_pos[:1].repeat(int(config.num_samples), 1)
     obj_dofs_vel = obj_dofs_vel[:1].repeat(int(config.num_samples), 1)
-    left_hand_dofs_vel = left_hand_dofs_vel[:1].repeat(int(config.num_samples), 1)
+    # left_hand_dofs_vel = left_hand_dofs_vel[:1].repeat(int(config.num_samples), 1)
     right_hand_dofs_vel = right_hand_dofs_vel[:1].repeat(int(config.num_samples), 1)
 
     # Set all entities dof positions and velocities
     env.objects[env.object_names[0]].entity.set_dofs_position(obj_dofs_pos)
-    env.robots["left"].entity.set_dofs_position(left_hand_dofs_pos)
+    # env.robots["left"].entity.set_dofs_position(left_hand_dofs_pos)
     env.robots["right"].entity.set_dofs_position(right_hand_dofs_pos)
     env.objects[env.object_names[0]].entity.set_dofs_velocity(obj_dofs_vel)
-    env.robots["left"].entity.set_dofs_velocity(left_hand_dofs_vel)
+    # env.robots["left"].entity.set_dofs_velocity(left_hand_dofs_vel)
     env.robots["right"].entity.set_dofs_velocity(right_hand_dofs_vel)
 
     return env
