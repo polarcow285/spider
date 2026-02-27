@@ -30,6 +30,7 @@ from spider.optimizers.sampling import (
 from spider.simulators.dexmachina import (
     copy_sample_state,
     get_obj_arti_dist,
+    get_obj_arti_dist_rad,
     get_obj_pos_dist,
     get_obj_quat_dist,
     get_qpos,
@@ -145,7 +146,8 @@ def main(config: Config):
             step_info = {
                 "obj_pos_dist": [],
                 "obj_quat_dist": [],
-                "obj_arti_dist": [],
+                # "obj_arti_dist": [],
+                "obj_arti_dist_rad": [],
                 "qpos": [],
             }
 
@@ -191,7 +193,8 @@ def main(config: Config):
 
                 step_info["obj_pos_dist"].append(get_obj_pos_dist(env)[0].item())
                 step_info["obj_quat_dist"].append(get_obj_quat_dist(env)[0].item())
-                step_info["obj_arti_dist"].append(get_obj_arti_dist(env)[0].item())
+                # step_info["obj_arti_dist"].append(get_obj_arti_dist(env)[0].item())
+                step_info["obj_arti_dist_rad"].append(get_obj_arti_dist_rad(env)[0].item())
                 step_info["qpos"].append(get_qpos(env)[0].detach().cpu().numpy())
                 sim_step += 1
                 if config.save_video:
@@ -248,10 +251,12 @@ def main(config: Config):
     # print object dist in mean and std
     obj_pos_dists = np.concatenate([info["obj_pos_dist"] for info in info_list])
     obj_quat_dists = np.concatenate([info["obj_quat_dist"] for info in info_list])
-    obj_arti_dists = np.concatenate([info["obj_arti_dist"] for info in info_list])
+    # obj_arti_dists = np.concatenate([info["obj_arti_dist"] for info in info_list])
+    obj_arti_dist_rad = np.concatenate([info["obj_arti_dist_rad"] for info in info_list])
     print(f"obj_pos_dist: {obj_pos_dists.mean():.4f} ± {obj_pos_dists.std():.4f}")
     print(f"obj_quat_dist: {obj_quat_dists.mean():.4f} ± {obj_quat_dists.std():.4f}")
-    print(f"obj_arti_dist: {obj_arti_dists.mean():.4f} ± {obj_arti_dists.std():.4f}")
+    # print(f"obj_arti_dist: {obj_arti_dists.mean():.4f} ± {obj_arti_dists.std():.4f}")
+    print(f"obj_arti_dist_rad: {obj_arti_dist_rad.mean():.4f} ± {obj_arti_dist_rad.std():.4f}")
 
     # save retargeted trajectory
     if config.save_info and len(info_list) > 0:

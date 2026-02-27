@@ -323,6 +323,7 @@ def make_optimize_once_fn(
 
         # compute info
         info = {}
+
         for k, v in rollout_info.items():
             if k not in ["trace", "trace_sample"]:
                 if isinstance(v, torch.Tensor):

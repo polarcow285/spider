@@ -17,6 +17,8 @@ from __future__ import annotations
 import genesis as gs
 import loguru
 import torch
+import numpy as np
+
 from dexmachina.envs.base_env import BaseEnv
 from dexmachina.envs.constructors import (
     get_all_env_cfg,
@@ -94,6 +96,8 @@ def setup_env(config: Config, ref_data: tuple[torch.Tensor, ...]) -> BaseEnv:
 
     # breakpoint()
 
+    env_kwargs['group_collisions'] = True
+
     env = BaseEnv(**env_kwargs)
     env._recording = False  # disable recording since we will do shooting
     env.reset()
@@ -124,8 +128,17 @@ def get_obj_arti_dist(env: BaseEnv) -> torch.Tensor:
     )
     demo_arti = env.reward_module.match_demo_state("obj_arti", env.episode_length_buf)
     obj_arti_dist = position_distance(demo_arti, obj_arti)
-    return obj_arti_dist
+    return obj_arti_dist # [1024]
 
+def get_obj_arti_dist_rad(env: BaseEnv) -> torch.Tensor:
+    """Get the articulation distance in radians between the object and the demo object."""
+    obj_arti = env.objects[env.object_names[0]].entity.get_dofs_position(
+        env.objects[env.object_names[0]].dof_idxs
+    ) # torch.Size([1024, 1])
+    demo_arti = env.reward_module.match_demo_state("obj_arti", env.episode_length_buf) # torch.Size([1024])
+    obj_arti_dist = demo_arti - obj_arti.squeeze(-1)
+    # diff = (obj_arti_dist + np.pi) % (2 * np.pi) - np.pi
+    return obj_arti_dist
 
 def reshape_contact_with_label(
     contact_link_pos: torch.Tensor, contact_link_valid: torch.Tensor
@@ -319,28 +332,36 @@ def get_imitation_reward(
     fingertip_dist_right = get_keypoint_dist(env, kpts_right, left_hand=False)
     fingertip_dist_left = torch.zeros_like(fingertip_dist_right)
 
+    # fingertip_dist = torch.mean(
+    #     (fingertip_dist_left + fingertip_dist_right) / 2.0, dim=-1
+    # )  # (B, num_links) -> (B,)
     fingertip_dist = torch.mean(
-        (fingertip_dist_left + fingertip_dist_right) / 2.0, dim=-1
+        (fingertip_dist_right), dim=-1
     )  # (B, num_links) -> (B,)
 
-    if exp_kpt_first:
+    if exp_kpt_first: # True
         fingertip_rew_left = torch.exp(-imi_fingertip_beta * fingertip_dist_left)
-        fingertip_rew_right = torch.exp(-imi_fingertip_beta * fingertip_dist_right)
+        # fingertip_rew_right = 10 * torch.exp(-imi_fingertip_beta * fingertip_dist_right)
+        fingertip_rew_right = 10 * torch.exp(-imi_fingertip_beta * fingertip_dist_right)
+        # fingertip_rew = torch.mean(
+        #     (fingertip_rew_left + fingertip_rew_right) / 2.0, dim=-1
+        # )  # (B, num_links) -> (B,)
         fingertip_rew = torch.mean(
-            (fingertip_rew_left + fingertip_rew_right) / 2.0, dim=-1
-        )  # (B, num_links) -> (B,)
+            (fingertip_rew_right), dim=-1
+        )
     else:
         fingertip_rew = torch.exp(-imi_fingertip_beta * fingertip_dist)
 
     # Optionally add wrist reward
+    imi_wrist_weight = 0.0
     if imi_wrist_weight > 0.0:
-        wrist_rew_left, _, _ = get_wrist_reward(
-            env,
-            wrist_pose_left,
-            side="left",
-            wrist_rot_beta=imi_wrist_rot_beta,
-            wrist_pos_beta=imi_wrist_pos_beta,
-        )
+        # wrist_rew_left, _, _ = get_wrist_reward(
+        #     env,
+        #     wrist_pose_left,
+        #     side="left",
+        #     wrist_rot_beta=imi_wrist_rot_beta,
+        #     wrist_pos_beta=imi_wrist_pos_beta,
+        # )
         wrist_rew_right, _, _ = get_wrist_reward(
             env,
             wrist_pose_right,
@@ -348,7 +369,8 @@ def get_imitation_reward(
             wrist_rot_beta=imi_wrist_rot_beta,
             wrist_pos_beta=imi_wrist_pos_beta,
         )
-        wrist_rew = (wrist_rew_left + wrist_rew_right) / 2.0
+        # wrist_rew = (wrist_rew_left + wrist_rew_right) / 2.0
+        wrist_rew = wrist_rew_right
         imi_rew = (
             imi_wrist_weight * wrist_rew + (1.0 - imi_wrist_weight) * fingertip_rew
         )
@@ -356,7 +378,7 @@ def get_imitation_reward(
         imi_rew = fingertip_rew
 
     imi_rew -= 1.0
-    imi_rew *= imi_rew_weight
+    # imi_rew *= imi_rew_weight
     return imi_rew
 
 
@@ -452,21 +474,30 @@ def get_reward(
     obj_pos_dist = get_obj_pos_dist(env)
     obj_quat_dist = get_obj_quat_dist(env)
     obj_dist = (obj_pos_dist + obj_quat_dist) / 2.0
-    obj_dist = torch.clamp(obj_dist, min=0.0, max=1.0)
+    # obj_dist = torch.clamp(obj_dist, min=0.0, max=1.0)
+
+    kpts_right = env.robots["right"].kpt_pos
+    fingertip_dist_right = get_keypoint_dist(env, kpts_right, left_hand=False).mean(dim=-1)
 
     # Get object articulation distance
-    obj_arti_dist = get_obj_arti_dist(env)
-    obj_arti_dist = torch.clamp(obj_arti_dist, min=0.0, max=1.0)
+    # obj_arti_dist = get_obj_arti_dist(env)
+
+    obj_arti_dist = get_obj_arti_dist_rad(env)
+
+    # obj_arti_dist = torch.clamp(obj_arti_dist, min=0.0, max=1.0)
 
     # Base tracking reward
-    obj_dist_rew = -obj_dist * 1.0
+    # obj_dist_rew = -obj_dist * 3.0
+    obj_dist_rew = -obj_dist* 1.0
+    # obj_arti_rew = -obj_arti_dist * 3.0
     obj_arti_rew = -obj_arti_dist * 1.0
     reward = obj_dist_rew + obj_arti_rew
 
     # Add imitation reward if enabled
     imi_rew_weight = getattr(config, "imi_rew_weight", 3.0)
     if imi_rew_weight > 0.0:
-        imi_fingertip_beta = getattr(config, "imi_fingertip_beta", 1.0)
+        imi_fingertip_beta = getattr(config, "imi_fingertip_beta", 10.0)
+        # imi_fingertip_beta = getattr(config, "imi_fingertip_beta", 14.0)
         imi_wrist_weight = getattr(config, "imi_wrist_weight", 0.0)
         imi_wrist_rot_beta = getattr(config, "imi_wrist_rot_beta", 1.0)
         imi_wrist_pos_beta = getattr(config, "imi_wrist_pos_beta", 1.0)
@@ -515,6 +546,7 @@ def get_reward(
         "obj_arti_rew": obj_arti_rew,
         "imi_rew": imi_rew,
         "contact_rew": contact_rew,
+        "fingertip_dist_right": fingertip_dist_right,
     }
 
     return reward, info
