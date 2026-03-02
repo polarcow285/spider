@@ -99,6 +99,13 @@ class Config:
     terminal_rew_scale: float = 1.0
     contact_rew_scale: float = 0.0
 
+    # === ADDITIONAL REWARD CONFIGURATION FOR BATCH JOBS===
+    obj_dist_rew_scale: float = 4.0
+    obj_arti_rew_scale: float = 4.0
+    fingertip_rew_scale: float = 10.0
+    imi_fingertip_beta: float = 13.0
+    output_traj_name: str = "trajectory_dexmachina"
+
     # === VISUALIZATION CONFIGURATION ===
     show_viewer: bool = True
     viewer: str = "mujoco"  # "mujoco" | "rerun" | "isaac"

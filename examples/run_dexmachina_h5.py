@@ -258,27 +258,30 @@ def main(config: Config):
     # print(f"obj_arti_dist: {obj_arti_dists.mean():.4f} ± {obj_arti_dists.std():.4f}")
     print(f"obj_arti_dist_rad: {obj_arti_dist_rad.mean():.4f} ± {obj_arti_dist_rad.std():.4f}")
 
+    file_name = f"{config.output_traj_name}_{config.obj_dist_rew_scale}_{config.obj_arti_rew_scale}_{config.fingertip_rew_scale}_{config.imi_fingertip_beta}"
     # save retargeted trajectory
     if config.save_info and len(info_list) > 0:
         info_aggregated = {}
         for k in info_list[0].keys():
             info_aggregated[k] = np.stack([info[k] for info in info_list], axis=0)
-        np.savez(f"{config.output_dir}/trajectory_dexmachina.npz", **info_aggregated)
+        # np.savez(f"{config.output_dir}/trajectory_dexmachina.npz", **info_aggregated)
+        np.savez(f"{config.output_dir}/{file_name}.npz", **info_aggregated)
         loguru.logger.info(
-            f"Saved info to {config.output_dir}/trajectory_dexmachina.npz"
+            f"Saved info to {config.output_dir}/{file_name}.npz"
         )
+
 
     # save video
     if config.save_video and len(env._recorded_frames) > 0:
         env.export_video(
-            f"{config.output_dir}/trajectory_dexmachina.mp4", wait_for_max=False
+            f"{config.output_dir}/{file_name}.mp4", wait_for_max=False
         )
         loguru.logger.info(
-            f"Saved video to {config.output_dir}/trajectory_dexmachina.mp4"
+            f"Saved video to {config.output_dir}/{file_name}.mp4"
         )
     # save retargeted trajectory to HDF5
     if config.save_info and len(traj_buffers["object_pos"]) > 0:
-        h5_path = f"{config.output_dir}/trajectory_dexmachina.h5"
+        h5_path = f"{config.output_dir}/{file_name}.h5"
 
         with h5py.File(h5_path, "w") as f:
             for k, v in traj_buffers.items():
