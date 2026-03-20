@@ -2,60 +2,71 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the trajectory data
-data = np.load('example_datasets/processed/arctic/leap_hand/right/notebook-26-66-s07-u02/0/trajectory_dexmachina.npz')
-
-# Labels for the 4 optimization stages based on your timesteps
-opt_labels = ["10/40", "20/40", "30/40", "40/40"]
+data = np.load('example_datasets/processed/arctic/leap_hand/right/scissors-25-186-s02-u01/0/trajectory_dexmachina_4.0_4.0_10.0_13.0.npz')
 
 # --- EASY CONFIGURATION ---
-# Simply add or remove key names from this list to update the plot
 keys_to_visualize = [
-    'rew_mean',           # Total reward
-    'obj_dist_rew_mean',  # Progress toward object
-    'obj_arti_rew_mean',  # Success in articulation
-    'contact_rew_mean',   # Physical contact quality
-    'obj_pos_dist_mean',  # Distance error (lower is usually better)
-    'obj_quat_dist_mean', # Rotation error
+    'rew_mean',
+    'obj_dist_rew_mean',
+    'obj_arti_rew_mean',
+    'contact_rew_mean',
+    'obj_pos_dist_mean',
+    'obj_quat_dist_mean',
     'imi_rew_mean',
-    'improvement',       # Learning progress
-    'fingertip_dist_right_mean',  # Distance of right hand fingertips to object
+    'improvement',
+    'fingertip_dist_right_mean',
 ]
 
-def plot_all_metrics(data, keys, labels):
-    # Determine grid size (2 columns)
-    num_keys = len(keys)
+def plot_all_metrics(data, keys):
+    # 1. Identify valid keys and determine the number of stages dynamically
+    valid_keys = [k for k in keys if k in data]
+    if not valid_keys:
+        print("No valid keys found in data.")
+        return
+
+    # Dynamically get the number of stages from the first valid array found
+    num_stages = data[valid_keys[0]].shape[0]
+
+    # Generate labels automatically (e.g., "Stage 1", "Stage 2"...)
+    # Or keep your fraction style if you prefer: [f"{i+1}/{num_stages}" for i in range(num_stages)]
+    opt_labels = [f"Stage {i+1}" for i in range(num_stages)]
+
+    # 2. Determine grid size
+    num_plots = len(valid_keys)
     cols = 2
-    rows = (num_keys + 1) // cols
+    rows = (num_plots + 1) // cols
 
     fig, axes = plt.subplots(rows, cols, figsize=(15, 5 * rows))
-    axes = axes.flatten()
 
-    for i, key in enumerate(keys):
-        if key not in data:
-            print(f"Key '{key}' not found in the file. Skipping...")
-            continue
+    # Handle the case where there is only one plot (axes won't be an array)
+    if num_plots == 1:
+        axes = [axes]
+    else:
+        axes = axes.flatten()
 
-        # Get the (4, 32) array for the current metric
+    # 3. Plotting Loop
+    for i, key in enumerate(valid_keys):
         values = data[key]
-        print(f"Plotting '{key}' with shape {values.shape}")
-        # Plot a line for each of the 4 optimization stages
-        for stage_idx in range(values.shape[0]):
-            axes[i].plot(values[stage_idx, :], label=f'Opt {labels[stage_idx]}')
 
-        # Clean up titles and labels
+        # Plot a line for every detected stage
+        for stage_idx in range(num_stages):
+            label = opt_labels[stage_idx] if stage_idx < len(opt_labels) else f"S{stage_idx}"
+            axes[i].plot(values[stage_idx, :], label=label)
+
+        # Formatting
         axes[i].set_title(key.replace('_', ' ').title(), fontsize=14, fontweight='bold')
         axes[i].set_xlabel('Step')
         axes[i].set_ylabel('Value')
         axes[i].legend(fontsize='small', loc='best')
         axes[i].grid(True, linestyle='--', alpha=0.5)
 
-    # Remove any extra empty subplots if the number of keys is odd
+    # Clean up empty subplots
     for j in range(i + 1, len(axes)):
         fig.delaxes(axes[j])
 
     plt.tight_layout()
     plt.savefig('comprehensive_trajectory_analysis.png')
-    print("Visualization saved as 'comprehensive_trajectory_analysis.png'")
+    print(f"Visualization saved with {num_stages} stages across {num_plots} metrics.")
 
 # Run the plotting function
-plot_all_metrics(data, keys_to_visualize, opt_labels)
+plot_all_metrics(data, keys_to_visualize)

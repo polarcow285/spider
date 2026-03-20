@@ -258,7 +258,7 @@ def main(config: Config):
     # print(f"obj_arti_dist: {obj_arti_dists.mean():.4f} ± {obj_arti_dists.std():.4f}")
     print(f"obj_arti_dist_rad: {obj_arti_dist_rad.mean():.4f} ± {obj_arti_dist_rad.std():.4f}")
 
-    file_name = f"{config.output_traj_name}_{config.obj_dist_rew_scale}_{config.obj_arti_rew_scale}_{config.fingertip_rew_scale}_{config.imi_fingertip_beta}"
+    file_name = f"{config.output_traj_name}_{config.obj_dist_rew_scale}_{config.obj_arti_rew_scale}_{config.fingertip_rew_scale}_{config.imi_fingertip_beta}_{config.imi_wrist_weight}"
     # save retargeted trajectory
     if config.save_info and len(info_list) > 0:
         info_aggregated = {}

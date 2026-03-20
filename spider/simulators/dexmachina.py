@@ -354,7 +354,6 @@ def get_imitation_reward(
         fingertip_rew = torch.exp(-imi_fingertip_beta * fingertip_dist)
 
     # Optionally add wrist reward
-    imi_wrist_weight = 0.0
     if imi_wrist_weight > 0.0:
         # wrist_rew_left, _, _ = get_wrist_reward(
         #     env,
@@ -499,7 +498,7 @@ def get_reward(
     if imi_rew_weight > 0.0:
         imi_fingertip_beta = getattr(config, "imi_fingertip_beta", config.imi_fingertip_beta)
         # imi_fingertip_beta = getattr(config, "imi_fingertip_beta", 1.0)
-        imi_wrist_weight = getattr(config, "imi_wrist_weight", 0.0)
+        imi_wrist_weight = getattr(config, "imi_wrist_weight",config.imi_wrist_weight)
         imi_wrist_rot_beta = getattr(config, "imi_wrist_rot_beta", 1.0)
         imi_wrist_pos_beta = getattr(config, "imi_wrist_pos_beta", 1.0)
         exp_kpt_first = getattr(config, "exp_kpt_first", True)

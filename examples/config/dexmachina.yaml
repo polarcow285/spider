@@ -8,8 +8,10 @@ dataset_name: "arctic"
 robot_type:  "leap_hand" # "leap_hand"  # "inspire_hand", "xhand", "dex3_hand"
 embodiment_type: "right" # "right"
 # task: "box-30-230"
+task: "screwdriver-0-271-s00-u00"
 # task: "notebook-26-66-s07-u02"
-task: "scissors-25-186-s02-u01"  # format: "object_name-start_frame-end_frame"
+# task: "scissors-25-186-s02-u01"  # format: "object_name-start_frame-end_frame"
+# task: "scissors-25-85-s02-u01"
 data_id: 0
 viewer: "gs"
 rerun_spawn: false
@@ -19,7 +21,7 @@ device: "cuda:0"
 simulator: dexmachina
 sim_dt: 0.02  # 0.02 # Genesis simulation timestep
 ctrl_dt: 0.20  # 0.20 # Control timestep (how often MPC updates)
-knot_dt: 0.20  # 0.20 # Knot point spacing
+knot_dt: 0.10  # 0.20 # Knot point spacing
 ref_dt: 0.02   # 0.02 # Reference trajectory timestep
 horizon: 0.40  # MPC horizon in seconds
 show_viewer: true
