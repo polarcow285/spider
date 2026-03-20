@@ -106,6 +106,7 @@ class Config:
     imi_fingertip_beta: float = 1.0
     imi_wrist_weight: float = 0.0
     output_traj_name: str = "screwdriver"
+    custom_demo: bool = False
 
     # === VISUALIZATION CONFIGURATION ===
     show_viewer: bool = True

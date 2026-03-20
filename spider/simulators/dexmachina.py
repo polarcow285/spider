@@ -97,6 +97,8 @@ def setup_env(config: Config, ref_data: tuple[torch.Tensor, ...]) -> BaseEnv:
     # breakpoint()
 
     env_kwargs['group_collisions'] = True
+    if config.custom_demo:
+        env_kwargs['custom_demo'] = True
 
     env = BaseEnv(**env_kwargs)
     env._recording = False  # disable recording since we will do shooting
@@ -135,7 +137,13 @@ def get_obj_arti_dist_rad(env: BaseEnv) -> torch.Tensor:
     obj_arti = env.objects[env.object_names[0]].entity.get_dofs_position(
         env.objects[env.object_names[0]].dof_idxs
     ) # torch.Size([1024, 1])
-    demo_arti = env.reward_module.match_demo_state("obj_arti", env.episode_length_buf) # torch.Size([1024])
+    if obj_arti.shape[-1] == 0:
+        return torch.zeros(
+            obj_arti.shape[0],
+            device=obj_arti.device,
+            dtype=obj_arti.dtype,
+        )
+    env.reward_module.match_demo_state("obj_arti", env.episode_length_buf) # torch.Size([1024])
     obj_arti_dist = demo_arti - obj_arti.squeeze(-1)
     # diff = (obj_arti_dist + np.pi) % (2 * np.pi) - np.pi
     return obj_arti_dist
@@ -320,7 +328,7 @@ def get_imitation_reward(
     exp_kpt_first: bool = True,
     fingertip_rew_scale: float = 10.0,
 ) -> torch.Tensor:
-    """Get the imitation reward based on keypoint and wrist tracking."""
+
     # Get keypoint positions
     # kpts_left = env.robots["left"].kpt_pos
     kpts_right = env.robots["right"].kpt_pos
@@ -491,6 +499,7 @@ def get_reward(
     obj_dist_rew = -obj_dist * config.obj_dist_rew_scale
     # obj_arti_rew = -obj_arti_dist * 1.0
     obj_arti_rew = -obj_arti_dist * config.obj_arti_rew_scale
+
     reward = obj_dist_rew + obj_arti_rew
 
     # Add imitation reward if enabled

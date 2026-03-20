@@ -9,6 +9,7 @@ robot_type:  "leap_hand" # "leap_hand"  # "inspire_hand", "xhand", "dex3_hand"
 embodiment_type: "right" # "right"
 # task: "box-30-230"
 task: "screwdriver-0-271-s00-u00"
+custom_demo: True
 # task: "notebook-26-66-s07-u02"
 # task: "scissors-25-186-s02-u01"  # format: "object_name-start_frame-end_frame"
 # task: "scissors-25-85-s02-u01"
