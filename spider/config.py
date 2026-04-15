@@ -105,7 +105,7 @@ class Config:
     fingertip_rew_scale: float = 1.0
     imi_fingertip_beta: float = 1.0
     imi_wrist_weight: float = 0.0
-    output_traj_name: str = "screwdriver"
+    output_traj_name: str = ""
     custom_demo: bool = False
 
     # === VISUALIZATION CONFIGURATION ===
@@ -118,7 +118,7 @@ class Config:
     save_metrics: bool = True
 
     # === TRACE RECORDING ===
-    trace_dt: float = 1 / 50.0
+    trace_dt: float = 1 / 30.0
     num_trace_uniform_samples: int = 4
     num_trace_topk_samples: int = 2
     trace_site_ids: list = field(default_factory=list)

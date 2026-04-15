@@ -143,7 +143,7 @@ def get_obj_arti_dist_rad(env: BaseEnv) -> torch.Tensor:
             device=obj_arti.device,
             dtype=obj_arti.dtype,
         )
-    env.reward_module.match_demo_state("obj_arti", env.episode_length_buf) # torch.Size([1024])
+    demo_arti = env.reward_module.match_demo_state("obj_arti", env.episode_length_buf) # torch.Size([1024])
     obj_arti_dist = demo_arti - obj_arti.squeeze(-1)
     # diff = (obj_arti_dist + np.pi) % (2 * np.pi) - np.pi
     return obj_arti_dist

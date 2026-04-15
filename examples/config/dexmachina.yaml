@@ -8,7 +8,7 @@ dataset_name: "arctic"
 robot_type:  "leap_hand" # "leap_hand"  # "inspire_hand", "xhand", "dex3_hand"
 embodiment_type: "right" # "right"
 # task: "box-30-230"
-task: "screwdriver-0-271-s00-u00"
+task: "screwdriver-0-1081-s00-u00" # "screwdriver-0-271-s00-u00"
 custom_demo: True
 # task: "notebook-26-66-s07-u02"
 # task: "scissors-25-186-s02-u01"  # format: "object_name-start_frame-end_frame"
@@ -20,16 +20,23 @@ device: "cuda:0"
 
 # Simulation and control parameters
 simulator: dexmachina
-sim_dt: 0.02  # 0.02 # Genesis simulation timestep
-ctrl_dt: 0.20  # 0.20 # Control timestep (how often MPC updates)
-knot_dt: 0.10  # 0.20 # Knot point spacing
-ref_dt: 0.02   # 0.02 # Reference trajectory timestep
-horizon: 0.40  # MPC horizon in seconds
+sim_dt: 0.0333  # 0.02 # Genesis simulation timestep
+ctrl_dt: 0.333  # 0.20 # Control timestep (how often MPC updates) # make 10% of horizon, decrease action noise, look at weights and make syre they are not 1/n
+knot_dt: 0.333  # 0.20 # Knot point spacing
+ref_dt: 0.0333  # 0.02 # Reference trajectory timestep
+horizon: 0.666  # 0.40 # MPC horizon in seconds
 show_viewer: true
 save_video: true
 save_info: true
 max_sim_steps: -1  # -1 means use full trajectory length
 nu: 36
+
+# for batch jobs
+obj_dist_rew_scale: 3.0
+obj_arti_rew_scale: 1.0
+fingertip_rew_scale: 1.0
+imi_fingertip_beta: 1.0
+output_traj_name: "30hz_drake_cylinder"
 
 # MPC optimization parameters
 max_num_iterations: 32  # Number of iterations per MPC step
