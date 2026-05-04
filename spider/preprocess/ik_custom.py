@@ -437,7 +437,7 @@ def main(
         mj_data_ik.qpos[-14:-7] = qpos_obj_right[0]
         mj_data_ik.qpos[-7:] = qpos_obj_left[0]
     elif embodiment_type == "right":
-        j_obj = mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_BODY, "screwdriver")
+        j_obj = mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_BODY, "bottom_visual")
         jnt_adr = mj_model.body_jntadr[j_obj]
         mj_data_ik.qpos[jnt_adr:jnt_adr+7] = qpos_obj_right[0]
     elif embodiment_type == "left":
@@ -591,8 +591,9 @@ def main(
                                 side_map = {
                                     "right": first_contact_frame_right,
                                     "left": first_contact_frame_left,
-                                }data["qpos_obj_right"][start_idx:end_idx]
-    qpos_obj_left = loaded_d_idx = finger_map[finger]
+                                }
+                                data["qpos_obj_right"][start_idx:end_idx]
+                                qpos_obj_left = loaded_d_idx = finger_map[finger]
                                 contact_frame = contact_frame_list[finger_idx]
 
                                 # Use smooth transition with clipping
