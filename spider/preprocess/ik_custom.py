@@ -310,7 +310,7 @@ def main(
     ]
 
     # special case: allegro hand
-    if robot_type in ["allegro", "metahand"]:
+    if robot_type in ["allegro", "metahand", "leap"]:
         sites_for_mimic.remove("right_pinky_tip")
         sites_for_mimic.remove("left_pinky_tip")
 
@@ -318,7 +318,7 @@ def main(
         sites_for_mimic = [s for s in sites_for_mimic if "right" in s]
     elif embodiment_type == "left":
         sites_for_mimic = [s for s in sites_for_mimic if "left" in s]
-
+    print(sites_for_mimic)
     site_ids = [
         mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_SITE, s)
         for s in sites_for_mimic
