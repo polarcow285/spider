@@ -3,7 +3,7 @@ Convert the custom mocap demo data to mjwp format.
 
 Input format: h5 file
 Keys: ['mano_joint_coords', 'wrist_pos', 'wrist_quat', 'wrist_rot_mat', 'obj_pos', 'obj_quat']
-    mano_joint_coords: shape=(271, 21, 3), dtype=float32
+      : shape=(271, 21, 3), dtype=float32
     wrist_pos: shape=(271, 3), dtype=float32
     wrist_quat: shape=(271, 4), dtype=float64
     wrist_rot_mat: shape=(271, 3, 3), dtype=float32
@@ -26,6 +26,10 @@ import h5py
 import numpy as np
 import tyro
 import loguru
+import spider
+import mujoco
+import mujoco.viewer
+from loop_rate_limiters import RateLimiter
 from spider.io import get_processed_data_dir
 
 def main(
@@ -71,7 +75,7 @@ def main(
         obj_quat = f["obj_quat"][:]                  # (T, 4)
     N = mano_keypoints.shape[0]
 
-    tip_ids = [4, 8, 12, 16, 20]
+    tip_ids = [16, 17, 18, 19, 20]
     unit_quat = np.array([1, 0, 0, 0])
     qpos_wrist_right = np.zeros((N, 7))
     qpos_finger_right = np.zeros((N, 5, 7))
@@ -91,10 +95,6 @@ def main(
     # ---- Object (right) ----
     qpos_obj_right = np.concatenate([obj_pos, obj_quat], axis=1).astype(np.float32)  # (T, 7)
 
-    # ---- Contact placeholders ----
-    contact = np.zeros((N,), dtype=np.float32)
-    contact_pos = np.zeros((N, 3), dtype=np.float32)
-
     np.savez(
         f"{output_dir}/trajectory_keypoints.npz",
         qpos_wrist_right=qpos_wrist_right[start_idx:],
@@ -105,6 +105,120 @@ def main(
         qpos_obj_left=qpos_obj_left[start_idx:],
     )
     loguru.logger.info(f"Saved qpos to {output_dir}/trajectory_keypoints.npz")
+
+    qpos_list = np.concatenate(
+        [
+            qpos_wrist_right[:, None],
+            qpos_finger_right,
+            qpos_wrist_left[:, None],
+            qpos_finger_left,
+            qpos_obj_right[:, None],
+            qpos_obj_left[:, None],
+        ],
+        axis=1,
+    )
+    # visualize
+    mj_spec = mujoco.MjSpec.from_file(f"{spider.ROOT}/assets/mano/empty_scene.xml")
+     # add right object to body "right_object"
+    object_right_handle = mj_spec.worldbody.add_body(
+        name="right_object",
+        mocap=True,
+    )
+    object_right_handle.add_site(
+        name="right_object",
+        type=mujoco.mjtGeom.mjGEOM_BOX,
+        size=[0.01, 0.02, 0.03],
+        rgba=[1, 0, 0, 1],
+        group=0,
+    )
+
+    if embodiment_type in ["right", "bimanual"]:
+        mj_spec.add_mesh(
+            name="right_object",
+            file=f"/home/nl455/spider/example_datasets/processed/custom/assets/objects/screwdriver/screwdriver.obj",
+        )
+        object_right_handle.add_geom(
+            name="right_object",
+            type=mujoco.mjtGeom.mjGEOM_MESH,
+            meshname="right_object",
+            pos=[0, 0, 0],
+            quat=[1, 0, 0, 0],
+            group=0,
+            condim=1,
+        )
+    # add left object to body "left_object"
+    object_left_handle = mj_spec.worldbody.add_body(
+        name="left_object",
+        mocap=True,
+    )
+    object_left_handle.add_site(
+        name="left_object",
+        type=mujoco.mjtGeom.mjGEOM_BOX,
+        size=[0.01, 0.02, 0.03],
+        rgba=[0, 1, 0, 1],
+        group=0,
+    )
+
+    mj_model = mj_spec.compile()
+    mj_data = mujoco.MjData(mj_model)
+    rate_limiter = RateLimiter(30.0)
+    if show_viewer:
+        run_viewer = lambda: mujoco.viewer.launch_passive(mj_model, mj_data)
+    else:
+
+        @contextmanager
+        def run_viewer():
+            yield type(
+                "DummyViewer",
+                (),
+                {
+                    "is_running": lambda: True,
+                    "sync": lambda: None,
+                    "cam": mujoco.MjvCamera(),
+                },
+            )
+
+    if save_video:
+        import imageio
+
+        mj_model.vis.global_.offwidth = 720
+        mj_model.vis.global_.offheight = 480
+        renderer = mujoco.Renderer(mj_model, height=480, width=720)
+        images = []
+
+    print("\n=== Mocap bodies in model ===")
+
+    for i in range(mj_model.nbody):
+        body = mj_model.body(i)
+
+        if body.mocapid[0] != -1:
+            print(
+                "body:",
+                body.name,
+                "mocap_id:",
+                body.mocapid[0],
+            )
+    with run_viewer() as gui:
+        cnt = 0
+        contact_seq = np.zeros((N, 10))
+        while gui.is_running():
+            mj_data.mocap_pos[:] = qpos_list[cnt, :, :3]
+            mj_data.mocap_quat[:] = qpos_list[cnt, :, 3:]
+            mujoco.mj_step(mj_model, mj_data)
+            cnt = (cnt + 1) % N
+            if save_video:
+                renderer.update_scene(mj_data, gui.cam)
+                img = renderer.render()
+                images.append(img)
+            if cnt == (N - 1):
+                if save_video:
+                    imageio.mimsave(f"{output_dir}/visualization.mp4", images, fps=120)
+                    loguru.logger.info(f"Saved video to {output_dir}/visualization.mp4")
+                if not show_viewer:
+                    break
+            if show_viewer:
+                gui.sync()
+                rate_limiter.sleep()
 
 if __name__ == "__main__":
     tyro.cli(main)

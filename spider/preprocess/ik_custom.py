@@ -63,7 +63,7 @@ def add_mocap_bodies(
 
     for mb_name in mocap_bodies:
         b_handle = mjspec.worldbody.add_body(name=mb_name, mocap=True)
-        if "palm" in mb_name or "object" in mb_name:
+        if "wrist" in mb_name or "object" in mb_name:
             b_handle.add_site(
                 name=mb_name,
                 type=mujoco.mjtGeom.mjGEOM_BOX,
@@ -120,9 +120,9 @@ def add_mocap_bodies(
 
 
 def get_robot_sites(robot_type: str, embodiment_type: str):
-    if robot_type in ["allegro", "metahand"]:
+    if robot_type in ["allegro", "metahand", "leap"]:
         sites_in_robot = [
-            "right_palm",
+            "right_wrist",
             "right_index_tip",
             "right_middle_tip",
             "right_ring_tip",
@@ -137,7 +137,7 @@ def get_robot_sites(robot_type: str, embodiment_type: str):
         ]
     else:
         sites_in_robot = [
-            "right_palm",
+            "right_wrist",
             "right_thumb_tip",
             "right_index_tip",
             "right_middle_tip",
@@ -265,7 +265,7 @@ def main(
     cnt = 0
     for sides in ["right", "left"]:
         for body_name in [
-            "palm",
+            "wrist",
             "thumb_tip",
             "index_tip",
             "middle_tip",
@@ -293,7 +293,7 @@ def main(
     cnt += 1
 
     sites_for_mimic = [
-        "right_palm",
+        "right_wrist",
         "right_thumb_tip",
         "right_index_tip",
         "right_middle_tip",
@@ -318,7 +318,6 @@ def main(
         sites_for_mimic = [s for s in sites_for_mimic if "right" in s]
     elif embodiment_type == "left":
         sites_for_mimic = [s for s in sites_for_mimic if "left" in s]
-    print(sites_for_mimic)
     site_ids = [
         mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_SITE, s)
         for s in sites_for_mimic
@@ -335,7 +334,7 @@ def main(
     # create mocap sites for retargeting
     site_joint_matches = {}
     for key in sites_for_mimic:
-        if "palm" in key:  # palm: strong rotation constraint, weak position constraint
+        if "wrist" in key:  # palm: strong rotation constraint, weak position constraint
             constraint_type = "mjEQ_WELD"
             solimp = [0.0, 0.95, wrist_solimp_width, 0.5, 2.0]
             torque_scale = wrist_torque_scale
@@ -394,7 +393,7 @@ def main(
         "ring_tip",
         "pinky_tip",
     ]
-    if robot_type in ["allegro", "metahand"]:
+    if robot_type in ["allegro", "metahand", "leap"]:
         finger_names = finger_names[:4]
 
     sides = {
@@ -519,8 +518,31 @@ def main(
                             ]
                     nq_obj = 14 if embodiment_type == "bimanual" else 7
                     qpos_diff_sum = 0.0
+
+                    # debugging joint order
+                    # JOINT_DIMS = {
+                    #     mujoco.mjtJoint.mjJNT_FREE: 7,
+                    #     mujoco.mjtJoint.mjJNT_BALL: 4,
+                    #     mujoco.mjtJoint.mjJNT_SLIDE: 1,
+                    #     mujoco.mjtJoint.mjJNT_HINGE: 1,
+                    # }
+
+                    # for i in range(mj_model.njnt):
+                    #     name = mujoco.mj_id2name(
+                    #         mj_model,
+                    #         mujoco.mjtObj.mjOBJ_JOINT,
+                    #         i
+                    #     )
+
+                    #     start = mj_model.jnt_qposadr[i]
+                    #     jtype = mj_model.jnt_type[i]
+                    #     dim = JOINT_DIMS[jtype]
+
+                    #     print(f"{name}: qpos[{start}:{start+dim}]")
+
                     for i in range(30):
-                        mj_data_ik.ctrl[:] = mj_data_ik.qpos[:-nq_obj].copy()
+                        # In our xml, the object is first
+                        mj_data_ik.ctrl[:] = mj_data_ik.qpos[nq_obj:].copy()
                         mujoco.mj_step(mj_model_ik, mj_data_ik)
                     # compute mocap diff
                     for mocap_id, qpos_id in zip(

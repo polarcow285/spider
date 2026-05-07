@@ -36,6 +36,7 @@ import tyro
 from loop_rate_limiters import RateLimiter
 from scipy.spatial.transform import Rotation as R
 
+import spider
 from spider.io import get_mesh_dir, get_processed_data_dir
 
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
@@ -58,7 +59,12 @@ def main(
     start_idx: int = 0,
 ):
     # path related
-    dataset_dir = os.path.abspath(dataset_get_mesh_dir,
+    dataset_dir = os.path.abspath(dataset_dir)
+    file_path = f"{dataset_dir}/raw/oakink/{task}_{embodiment_type}.pkl"
+    output_dir = get_processed_data_dir(
+        dataset_dir=dataset_dir,
+        dataset_name="oakink",
+        robot_type="mano",
         embodiment_type=embodiment_type,
         task=task,
         data_id=0,

@@ -3,13 +3,13 @@ defaults:
   - _self_
 
 # === TASK CONFIGURATION ===
-robot_type: xhand # "inspire", "allegro", "g1"
-embodiment_type: bimanual # "left", "right", "bimanual", "CMU"
-task: pick_spoon_bowl
+robot_type: leap # "inspire", "allegro", "g1"
+embodiment_type: right # "left", "right", "bimanual", "CMU"
+task: screwdriver
 
 # === DATASET CONFIGURATION ===
 dataset_dir: example_datasets
-dataset_name: oakink
+dataset_name: custom
 data_id: 0
 model_path: ""
 data_path: ""
