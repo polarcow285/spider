@@ -3,13 +3,16 @@ defaults:
   - _self_
 
 # === TASK CONFIGURATION ===
-robot_type: leap # "inspire", "allegro", "g1"
-embodiment_type: right # "left", "right", "bimanual", "CMU"
+robot_type: leap
+embodiment_type: right
 task: screwdriver
+# robot_type: xhand  # "inspire", "allegro", "g1", "xhand"
+# embodiment_type: bimanual # "left", "right", "bimanual", "CMU"
+# task: pick_spoon_bowl #screwdriver # pick_spoon_bowl
 
 # === DATASET CONFIGURATION ===
 dataset_dir: example_datasets
-dataset_name: custom
+dataset_name: custom # oakink, custom
 data_id: 0
 model_path: ""
 data_path: ""
@@ -26,8 +29,8 @@ horizon: 1.6 # planning horizon
 knot_dt: 0.4 # knot point spacing
 max_sim_steps: -1 # maximum simulation steps (-1 for unlimited)
 # Simulation constraints
-nconmax_per_env: 80 # max contacts per environment
-njmax_per_env: 300 # max joints per environment
+nconmax_per_env: 2100 # max contacts per environment
+njmax_per_env: 20500 # max joints per environment
 # Simulation annealing
 num_dyn: 1 # number of environments for annealing, used for virtual contact constraint
 # Domain randomization
@@ -41,7 +44,7 @@ perturb_torque: 0.0
 # Sampling parameters
 num_samples: 1024
 temperature: 0.1
-max_num_iterations: 32
+max_num_iterations: 32  # 32
 improvement_threshold: 0.01
 # Noise scheduling
 first_ctrl_noise_scale: 0.5

@@ -132,6 +132,7 @@ def main(config: Config):
         load_env_params,
         copy_sample_state,
     )
+
     optimize_once = make_optimize_once_fn(rollout)
     optimize = make_optimize_fn(optimize_once)
 
@@ -142,6 +143,7 @@ def main(config: Config):
 
     # run viewer + control loop
     t_start = time.perf_counter()
+    print("starting loop")
     with run_viewer() as viewer:
         while viewer.is_running():
             t0 = time.perf_counter()
@@ -152,10 +154,12 @@ def main(config: Config):
                 ref_data, sim_step + 1, sim_step + config.horizon_steps + 1
             )
             ctrls, infos = optimize(config, env, ctrls, ref_slice)
+            print("Finished optimizing")
 
             # step environment for ctrl_steps
             step_info = {"qpos": [], "qvel": [], "time": [], "ctrl": []}
             for i in range(config.ctrl_steps):
+                print("i: ", i)
                 # option 1: use mujoco step
                 # mj_data.ctrl[:] = ctrls[i].detach().cpu().numpy()
                 # mujoco.mj_step(mj_model, mj_data)

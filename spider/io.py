@@ -32,17 +32,16 @@ def load_data(
     """Load trajectory data from NPZ file."""
     print("Loading data from " + data_path)
     raw_data = np.load(data_path)
-    breakpoint()
     qpos_ref = raw_data["qpos"]
     qvel_ref = raw_data["qvel"]
     # TODO Look into contact data and see if we need it?
     try:
-        contact = raw_data["asdf"]
+        contact = raw_data["contact"]
     except:
         contact = np.zeros((qpos_ref.shape[0], 10))
         loguru.logger.warning("contact data not found")
     try:
-        contact_pos = raw_data["asdf"]
+        contact_pos = raw_data["contact_pos"]
     except:
         contact_pos = np.zeros((qpos_ref.shape[0], 10, 3))
         loguru.logger.warning("contact_pos data not found")

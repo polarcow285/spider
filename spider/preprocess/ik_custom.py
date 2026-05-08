@@ -158,6 +158,41 @@ def get_robot_sites(robot_type: str, embodiment_type: str):
         sites_in_robot = [s for s in sites_in_robot if "left" in s]
     return sites_in_robot
 
+def print_mj_qpos_layout(model):
+    print("\n========== MuJoCo qpos layout ==========")
+    qpos_index = 0
+
+    for jid in range(model.njnt):
+        jnt_type = model.jnt_type[jid]
+        jnt_name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_JOINT, jid)
+        if jnt_name == None:
+            jnt_name = ""
+        qpos_addr = model.jnt_qposadr[jid]
+
+        if jnt_type == mujoco.mjtJoint.mjJNT_FREE:
+            size = 7
+        elif jnt_type == mujoco.mjtJoint.mjJNT_BALL:
+            size = 4
+        else:
+            size = 1
+
+        print(f"[qpos {qpos_addr:03d}:{qpos_addr+size:03d}] {jnt_name:30s} type={jnt_type}")
+
+        qpos_index += size
+
+    print("Total qpos size:", model.nq)
+    print("========================================\n")
+
+def print_script_qpos_order(index_map):
+    print("\n========== Script index_map qpos order ==========")
+
+    ordered = sorted(index_map.items(), key=lambda x: x[1]["qpos_idx"])
+
+    for name, info in ordered:
+        print(f"qpos_idx={info['qpos_idx']:02d}  name={name}")
+
+    print("=================================================\n")
+
 
 # parameters
 def main(
@@ -259,6 +294,7 @@ def main(
     mj_model = mujoco.MjModel.from_xml_path(model_path)
     mj_model.opt.timestep = sim_dt
     mj_data = mujoco.MjData(mj_model)
+    print_mj_qpos_layout(mj_model)
 
     # NOTE: sites for mimic should follow the order of data
     index_map = {}
@@ -290,6 +326,7 @@ def main(
         "mocap_idx": -1,
         "eq_constraint_idx": -1,
     }
+
     cnt += 1
 
     sites_for_mimic = [
@@ -476,6 +513,7 @@ def main(
         name = mujoco.mj_id2name(mj_model, mujoco.mjtObj.mjOBJ_SITE, sid)
         if name is not None and name.startswith("track"):
             track_site_ids.append(sid)
+
     for sid in track_site_ids:
         track_name = mujoco.mj_id2name(mj_model, mujoco.mjtObj.mjOBJ_SITE, sid)
         ref_name = track_name.replace("track", "ref")
@@ -486,6 +524,7 @@ def main(
         # get site id of ref site
         ref_site_id = mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_SITE, ref_name)
         ref_site_ids.append(ref_site_id)
+    print("Ref mocap ids: ", ref_mocap_ids)
 
     with run_viewer() as gui:
         cnt = 0
@@ -519,30 +558,9 @@ def main(
                     nq_obj = 14 if embodiment_type == "bimanual" else 7
                     qpos_diff_sum = 0.0
 
-                    # debugging joint order
-                    # JOINT_DIMS = {
-                    #     mujoco.mjtJoint.mjJNT_FREE: 7,
-                    #     mujoco.mjtJoint.mjJNT_BALL: 4,
-                    #     mujoco.mjtJoint.mjJNT_SLIDE: 1,
-                    #     mujoco.mjtJoint.mjJNT_HINGE: 1,
-                    # }
-
-                    # for i in range(mj_model.njnt):
-                    #     name = mujoco.mj_id2name(
-                    #         mj_model,
-                    #         mujoco.mjtObj.mjOBJ_JOINT,
-                    #         i
-                    #     )
-
-                    #     start = mj_model.jnt_qposadr[i]
-                    #     jtype = mj_model.jnt_type[i]
-                    #     dim = JOINT_DIMS[jtype]
-
-                    #     print(f"{name}: qpos[{start}:{start+dim}]")
-
                     for i in range(30):
                         # In our xml, the object is first
-                        mj_data_ik.ctrl[:] = mj_data_ik.qpos[nq_obj:].copy()
+                        mj_data_ik.ctrl[:] = mj_data_ik.qpos[:-nq_obj].copy()
                         mujoco.mj_step(mj_model_ik, mj_data_ik)
                     # compute mocap diff
                     for mocap_id, qpos_id in zip(
@@ -704,6 +722,34 @@ def main(
             cnt += 1
             if cnt == H:
                 cost_mean = cost_sum / H
+                def decode_qpos(model):
+                    mapping = []
+
+                    for jid in range(model.njnt):
+                        name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_JOINT, jid)
+                        jtype = model.jnt_type[jid]
+                        addr = model.jnt_qposadr[jid]
+
+                        if jtype == mujoco.mjtJoint.mjJNT_FREE:
+                            size = 7
+                            fields = ["x", "y", "z", "qw", "qx", "qy", "qz"]
+                        elif jtype == mujoco.mjtJoint.mjJNT_BALL:
+                            size = 4
+                            fields = ["qw", "qx", "qy", "qz"]
+                        else:
+                            size = 1
+                            fields = ["q"]
+
+                        for i in range(size):
+                            mapping.append((addr + i, f"{name}:{fields[i]}"))
+
+                    return sorted(mapping, key=lambda x: x[0])
+
+
+                print("\n========== FULL 29D qpos decoding ==========\n")
+                mapping = decode_qpos(mj_model)
+                for idx, label in mapping:
+                    print(f"qpos[{idx:02d}] → {label}")
                 if show_viewer:
                     # check if the rollout is good, if so, break
                     user_input = input("Is the rollout good? (y/n): ")
