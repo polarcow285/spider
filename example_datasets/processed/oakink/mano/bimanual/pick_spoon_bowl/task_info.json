@@ -1,0 +1,10 @@
+{
+  "task": "pick_spoon_bowl",
+  "dataset_name": "oakink",
+  "robot_type": "mano",
+  "embodiment_type": "bimanual",
+  "data_id": 0,
+  "right_object_mesh_dir": "/home/nl455/spider/example_datasets/processed/oakink/assets/objects/O02@0030@00002",
+  "left_object_mesh_dir": "/home/nl455/spider/example_datasets/processed/oakink/assets/objects/C12001",
+  "ref_dt": 0.02
+}

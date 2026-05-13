@@ -1,0 +1,14 @@
+{
+  "task": "pour_tube",
+  "dataset_name": "oakink",
+  "robot_type": "inspire",
+  "hand_type": "bimanual",
+  "data_id": 0,
+  "right_object_mesh_dir": "processed/oakink/assets/objects/O02@0011@00003",
+  "left_object_mesh_dir": "processed/oakink/assets/objects/O02@0202@00002",
+  "right_object_convex_dir": "processed/oakink/assets/objects/O02@0011@00003/convex",
+  "left_object_convex_dir": "processed/oakink/assets/objects/O02@0202@00002/convex",
+  "ref_dt": 0.02,
+  "sim_dt": 0.01,
+  "act_sim_dt": 0.005
+}

@@ -1,0 +1,14 @@
+{
+  "task": "uncap_alcohol_burner",
+  "dataset_name": "oakink",
+  "robot_type": "xhand",
+  "hand_type": "bimanual",
+  "data_id": 0,
+  "right_object_mesh_dir": "processed/oakink/assets/objects/O02@0206@00001",
+  "left_object_mesh_dir": "processed/oakink/assets/objects/O02@0206@00002",
+  "right_object_convex_dir": "processed/oakink/assets/objects/O02@0206@00001/convex",
+  "left_object_convex_dir": "processed/oakink/assets/objects/O02@0206@00002/convex",
+  "ref_dt": 0.02,
+  "sim_dt": 0.01,
+  "act_sim_dt": 0.005
+}

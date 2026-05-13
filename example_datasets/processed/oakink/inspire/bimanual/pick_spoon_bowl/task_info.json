@@ -1,0 +1,14 @@
+{
+  "task": "pick_spoon_bowl",
+  "dataset_name": "oakink",
+  "robot_type": "inspire",
+  "embodiment_type": "bimanual",
+  "data_id": 0,
+  "right_object_mesh_dir": "processed/oakink/assets/objects/O02@0030@00002",
+  "right_object_convex_dir": "processed/oakink/assets/objects/O02@0030@00002/convex",
+  "left_object_mesh_dir": "processed/oakink/assets/objects/C12001",
+  "left_object_convex_dir": "processed/oakink/assets/objects/C12001/convex",
+  "ref_dt": 0.02,
+  "sim_dt": 0.01,
+  "act_sim_dt": 0.005
+}
