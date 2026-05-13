@@ -70,9 +70,9 @@ object_pos_threshold: 0.1 # meters
 object_rot_threshold: 0.3 # radians
 
 # === VISUALIZATION CONFIGURATION ===
-show_viewer: true
-viewer: mujoco-rerun # "mujoco" | "rerun" | "isaac"
-rerun_spawn: true
+show_viewer: false
+viewer: rerun # "mujoco" | "rerun" | "isaac"
+rerun_spawn: false
 save_video: true
 save_rerun: false
 save_metrics: true
