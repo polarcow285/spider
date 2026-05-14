@@ -390,6 +390,10 @@ def make_optimize_fn(
             infos.append(info)
             improvement_history.append(info["improvement"])
 
+            print(f"[optimize] iteration {i}")
+            print(f"info: {info}")
+
+
             # early stopping: check if last n steps all have improvement below threshold
             terminate_all = terminate.all()
             terminate_early_stopping = terminate_all and config.terminate_resample
