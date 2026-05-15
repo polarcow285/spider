@@ -208,12 +208,26 @@ example_datasets/processed/*
 !example_datasets/processed/custom/**
 !example_datasets/processed/oakink/
 !example_datasets/processed/oakink/**
+# allow git to descend into arctic
+!example_datasets/processed/arctic/
+
+# ignore everything inside arctic
+example_datasets/processed/arctic/*
+
+# except assets
+!example_datasets/processed/arctic/assets/
+!example_datasets/processed/arctic/assets/**
+!example_datasets/processed/arctic/leap
+!example_datasets/processed/arctic/leap**
+
 
 example_datasets/raw/*
 !example_datasets/raw/custom/
 !example_datasets/raw/custom/**
 !example_datasets/raw/oakink/
 !example_datasets/raw/oakink/**
+!example_datasets/raw/arctic/
+!example_datasets/raw/arctic/**
 
 
 tmp/
