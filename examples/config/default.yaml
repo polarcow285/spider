@@ -5,14 +5,14 @@ defaults:
 # === TASK CONFIGURATION ===
 robot_type: leap
 embodiment_type: right
-task: screwdriver
+task: scissors
 # robot_type: xhand  # "inspire", "allegro", "g1", "xhand"
 # embodiment_type: bimanual # "left", "right", "bimanual", "CMU"
 # task: pick_spoon_bowl #screwdriver # pick_spoon_bowl
 
 # === DATASET CONFIGURATION ===
 dataset_dir: example_datasets
-dataset_name: custom # oakink, custom
+dataset_name: arctic # oakink, custom
 data_id: 0
 model_path: ""
 data_path: ""
@@ -25,7 +25,7 @@ sim_dt: 0.01 # simulation timestep
 ctrl_dt: 0.4 # control timestep
 ref_dt: 0.02 # reference data timestep (1/50.0)
 render_dt: 0.02 # rendering timestep
-horizon: 1.6 # planning horizon
+horizon: 2.0 # 1.6 # planning horizon
 knot_dt: 0.4 # knot point spacing
 max_sim_steps: -1 # maximum simulation steps (-1 for unlimited)
 # Simulation constraints
@@ -44,7 +44,7 @@ perturb_torque: 0.0
 # Sampling parameters
 num_samples: 1024
 temperature: 0.1
-max_num_iterations: 1  # 32
+max_num_iterations: 32 # 32
 improvement_threshold: 0.01
 # Noise scheduling
 first_ctrl_noise_scale: 0.5
@@ -60,7 +60,7 @@ rot_noise_scale: 0.03
 base_pos_rew_scale: 1.0
 base_rot_rew_scale: 0.3
 joint_rew_scale: 0.003
-pos_rew_scale: 1.0
+pos_rew_scale: 1.0 # 1.0
 rot_rew_scale: 0.3
 vel_rew_scale: 0.0001
 terminal_rew_scale: 1.0
