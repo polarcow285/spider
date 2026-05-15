@@ -15,7 +15,10 @@ Date: 2025-08-11
 from __future__ import annotations
 
 import time
+from pathlib import Path
 
+import os
+os.environ["MUJOCO_GL"] = "egl"
 import hydra
 import imageio
 import loguru
@@ -23,6 +26,7 @@ import mujoco
 import numpy as np
 import torch
 from omegaconf import DictConfig
+
 
 from spider.config import Config, process_config
 from spider.interp import get_slice
@@ -51,6 +55,61 @@ from spider.simulators.mjwp import (
 )
 from spider.viewers import render_image, setup_renderer, setup_viewer, update_viewer
 from spider.viewers.rerun_viewer import log_frame
+
+
+def _value_at_opt_step(info: dict, key: str) -> float:
+    """Read an optimizer summary value from the last real optimization step."""
+    value = np.asarray(info[key])
+    opt_step = int(np.asarray(info.get("opt_steps", [value.shape[0]])).reshape(-1)[0])
+    opt_idx = max(0, min(opt_step - 1, value.shape[0] - 1))
+    return float(np.asarray(value[opt_idx]).reshape(-1)[0])
+
+
+def save_reward_plot(info_list: list[dict], output_path: str) -> None:
+    """Save a reward-over-time plot from per-control-tick optimizer infos."""
+    if len(info_list) == 0 or "rew_mean" not in info_list[0]:
+        return
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    times = []
+    for step_idx, info in enumerate(info_list):
+        if "time" in info:
+            times.append(float(np.asarray(info["time"]).reshape(-1)[-1]))
+        else:
+            times.append(float(step_idx))
+    times = np.asarray(times)
+
+    reward_keys = ["rew_mean"]
+    reward_keys.extend(
+        sorted(
+            key
+            for key in info_list[0].keys()
+            if key.endswith("_rew_mean") and key != "rew_mean"
+        )
+    )
+
+    fig, ax = plt.subplots(figsize=(10, 5), dpi=160)
+    for key in reward_keys:
+        values = np.asarray([_value_at_opt_step(info, key) for info in info_list])
+        label = "overall reward" if key == "rew_mean" else key.removesuffix("_mean")
+        ax.plot(times, values, linewidth=2.0 if key == "rew_mean" else 1.4, label=label)
+
+    ax.set_title("MJWP rewards over time")
+    ax.set_xlabel("time (s)")
+    ax.set_ylabel("reward")
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="best")
+    fig.tight_layout()
+
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path)
+    plt.close(fig)
+    loguru.logger.info(f"Saved reward plot to {output_path}")
 
 
 def main(config: Config):
@@ -246,6 +305,13 @@ def main(config: Config):
             fps=int(1 / config.render_dt),
         )
         loguru.logger.info(f"Saved video to {video_path}")
+
+    # save reward plot
+    if len(info_list) > 0:
+        save_reward_plot(
+            info_list,
+            f"{config.output_dir}/visualization_mjwp.png",
+        )
 
     return
 

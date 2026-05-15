@@ -202,21 +202,18 @@ MJDATA.TXT
 outputs/
 
 submitit/
-example_datasets/processed/amass
-example_datasets/processed/arctic
-example_datasets/processed/fair_fre
-example_datasets/processed/fair_mon
-example_datasets/processed/gigahand
-example_datasets/processed/hdmi
-example_datasets/processed/hot3d
-example_datasets/processed/maniptrans
-example_datasets/processed/omomo
 
-example_datasets/raw/dexmachina
-example_datasets/raw/fair_fre
-example_datasets/raw/fair_mon
-example_datasets/raw/gigahand
-example_datasets/raw/maniptrans
+example_datasets/processed/*
+!example_datasets/processed/custom/
+!example_datasets/processed/custom/**
+!example_datasets/processed/oakink/
+!example_datasets/processed/oakink/**
+
+example_datasets/raw/*
+!example_datasets/raw/custom/
+!example_datasets/raw/custom/**
+!example_datasets/raw/oakink/
+!example_datasets/raw/oakink/**
 
 
 tmp/

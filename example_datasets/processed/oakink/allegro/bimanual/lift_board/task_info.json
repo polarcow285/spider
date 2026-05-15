@@ -1,0 +1,13 @@
+{
+  "task": "lift_board",
+  "dataset_name": "oakink",
+  "robot_type": "allegro",
+  "embodiment_type": "bimanual",
+  "data_id": 0,
+  "right_object_mesh_dir": "processed/oakink/assets/objects/O02@0018@00001",
+  "left_object_mesh_dir": null,
+  "ref_dt": 0.02,
+  "right_object_convex_dir": "processed/oakink/assets/objects/O02@0018@00001/convex",
+  "sim_dt": 0.01,
+  "act_sim_dt": 0.005
+}
