@@ -211,7 +211,7 @@ def _weight_diff_qpos(config: Config) -> torch.Tensor:
         w[3:6] = config.base_rot_rew_scale
         w[6 : config.nu] = config.joint_rew_scale
         w[-6:-3] = config.pos_rew_scale
-        w[-3:] = config.rot_rew_scale
+        w[-3:] = config.obj_rot_rew_scale # config.rot_rew_scale
     elif config.embodiment_type in ["humanoid"]:  # humanoid robot
         # robot pos and rot
         w[:3] = config.pos_rew_scale
@@ -310,6 +310,7 @@ def get_reward(
 
     qpos_rew = -qpos_dist * 1.0
     qvel_rew = -config.vel_rew_scale * qvel_dist * 1.0
+    qvel_rew[-3:] = qvel_rew[-3:] * config.vel_obj_rot_rew_scale
     reward = qpos_rew + qvel_rew
 
     info = {

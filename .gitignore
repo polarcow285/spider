@@ -1,3 +1,4 @@
+slurm_out/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -215,7 +216,8 @@ example_datasets/raw/*
 !example_datasets/raw/oakink/
 !example_datasets/raw/oakink/**
 
-
+*.mp4
+*.png
 tmp/
 
 # VitePress documentation

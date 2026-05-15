@@ -64,6 +64,8 @@ base_rot_rew_scale: 0.03  # 0.3
 joint_rew_scale: 0.003  # 0.003
 pos_rew_scale: 1.0  # 1.0
 rot_rew_scale: 0.3
+obj_rot_rew_scale: 0.3 # Custom param for controlling object rotation reward
+vel_obj_rot_rew_scale: 1.0 # Custom param for controlling object rotation velocity reward
 vel_rew_scale: 0.0  # 0.0001
 terminal_rew_scale: 1.0  # 1.0
 # Termination threshold
@@ -72,9 +74,9 @@ object_pos_threshold: 0.1 # meters
 object_rot_threshold: 0.3 # radians
 
 # === VISUALIZATION CONFIGURATION ===
-show_viewer: true
-viewer: mujoco-rerun # "mujoco" | "rerun" | "viser" | "isaac"
-rerun_spawn: true
+show_viewer: false
+viewer: rerun # "mujoco" | "rerun" | "viser" | "isaac"
+rerun_spawn: false
 save_video: true
 save_rerun: false
 save_metrics: true

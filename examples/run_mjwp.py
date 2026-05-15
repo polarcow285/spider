@@ -116,7 +116,7 @@ def main(config: Config):
     """Run the SPIDER using MuJoCo Warp backend"""
     # process config, set defaults and derived fields
     config = process_config(config)
-
+    print(config.data_path)
     # load reference data (already interpolated and extended)
     qpos_ref, qvel_ref, ctrl_ref, contact, contact_pos = load_data(
         config, config.data_path
@@ -218,7 +218,6 @@ def main(config: Config):
             # step environment for ctrl_steps
             step_info = {"qpos": [], "qvel": [], "time": [], "ctrl": []}
             for i in range(config.ctrl_steps):
-                print("i: ", i)
                 # option 1: use mujoco step
                 # mj_data.ctrl[:] = ctrls[i].detach().cpu().numpy()
                 # mujoco.mj_step(mj_model, mj_data)
@@ -287,18 +286,18 @@ def main(config: Config):
 
         t_end = time.perf_counter()
         print(f"Total time: {t_end - t_start:.4f}s")
-
+    save_name = f"vel_obj_rot_rew_scale{config.vel_obj_rot_rew_scale}_obj_rot_rew_scale{config.obj_rot_rew_scale}_num_samples{config.num_samples}_trajectory_mjwp"
     # save retargeted trajectory
     if config.save_info and len(info_list) > 0:
         info_aggregated = {}
         for k in info_list[0].keys():
             info_aggregated[k] = np.stack([info[k] for info in info_list], axis=0)
-        np.savez(f"{config.output_dir}/trajectory_mjwp.npz", **info_aggregated)
-        loguru.logger.info(f"Saved info to {config.output_dir}/trajectory_mjwp.npz")
+        np.savez(f"{config.output_dir}/{save_name}.npz", **info_aggregated)
+        loguru.logger.info(f"Saved info to {config.output_dir}/{save_name}.npz")
 
     # save video
     if config.save_video and len(images) > 0:
-        video_path = f"{config.output_dir}/visualization_mjwp.mp4"
+        video_path = f"{config.output_dir}/{save_name}.mp4"
         imageio.mimsave(
             video_path,
             images,
@@ -310,7 +309,7 @@ def main(config: Config):
     if len(info_list) > 0:
         save_reward_plot(
             info_list,
-            f"{config.output_dir}/visualization_mjwp.png",
+            f"{config.output_dir}/{save_name}_visualization_mjwp.png",
         )
 
     return

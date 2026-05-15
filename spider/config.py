@@ -92,6 +92,8 @@ class Config:
     joint_noise_scale: float = 0.3
     pos_noise_scale: float = 0.003
     rot_noise_scale: float = 0.003
+    obj_rot_rew_scale: float = 0.3  # Custom param for controlling object rotation reward
+    vel_obj_rot_rew_scale: float = 1.0
     # Reward scaling
     base_pos_rew_scale: float = 0.03
     base_rot_rew_scale: float = 0.01

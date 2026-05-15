@@ -11,15 +11,15 @@
 
     <!-- hand meshes -->
     <mesh name="palm" file="robots/leap/assets/palm_right.obj"/>
-    <mesh name="base" file="robots/leap/assets//base.obj"/>
-    <mesh name="proximal" file="robots/leap/assets//proximal.obj"/>
-    <mesh name="medial" file="robots/leap/assets//medial.obj"/>
-    <mesh name="distal" file="robots/leap/assets//distal.obj"/>
-    <mesh name="tip" file="robots/leap/assets//tip.obj"/>
-    <mesh name="thumb_base" file="robots/leap/assets//thumb_base.obj"/>
-    <mesh name="thumb_proximal" file="robots/leap/assets//thumb_proximal.obj"/>
-    <mesh name="thumb_distal" file="robots/leap/assets//thumb_distal.obj"/>
-    <mesh name="thumb_tip" file="robots/leap/assets//thumb_tip.obj"/>
+    <mesh name="base" file="robots/leap/assets/base.obj"/>
+    <mesh name="proximal" file="robots/leap/assets/proximal.obj"/>
+    <mesh name="medial" file="robots/leap/assets/medial.obj"/>
+    <mesh name="distal" file="robots/leap/assets/distal.obj"/>
+    <mesh name="tip" file="robots/leap/assets/tip.obj"/>
+    <mesh name="thumb_base" file="robots/leap/assets/thumb_base.obj"/>
+    <mesh name="thumb_proximal" file="robots/leap/assets/thumb_proximal.obj"/>
+    <mesh name="thumb_distal" file="robots/leap/assets/thumb_distal.obj"/>
+    <mesh name="thumb_tip" file="robots/leap/assets/thumb_tip.obj"/>
 
     <!-- Meshes -->
     <mesh name="bottom_visual" file="objects/screwdriver/screwdriver.obj" scale="1.5 1.5 1.5"/>
