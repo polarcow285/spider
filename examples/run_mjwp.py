@@ -18,8 +18,8 @@ import time
 from pathlib import Path
 
 import os
-os.environ["MUJOCO_GL"] = "egl"
 import hydra
+# os.environ["MUJOCO_GL"] = "egl"
 import imageio
 import loguru
 import mujoco
