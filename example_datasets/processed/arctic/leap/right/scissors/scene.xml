@@ -11,7 +11,7 @@
     <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
 
     <!-- hand meshes -->
-     <mesh name="palm" file="robots/leap/assets/palm_right.obj"/>
+    <mesh name="palm" file="robots/leap/assets/palm_right.obj"/>
     <mesh name="base" file="robots/leap/assets//base.obj"/>
     <mesh name="proximal" file="robots/leap/assets/proximal.obj"/>
     <mesh name="medial" file="robots/leap/assets/medial.obj"/>

@@ -19,7 +19,7 @@ from pathlib import Path
 
 import os
 import hydra
-# os.environ["MUJOCO_GL"] = "egl"
+os.environ["MUJOCO_GL"] = "egl"
 import imageio
 import loguru
 import mujoco
@@ -287,18 +287,18 @@ def main(config: Config):
 
         t_end = time.perf_counter()
         print(f"Total time: {t_end - t_start:.4f}s")
-
+    save_name = f"num_samples{config.num_samples}"
     # save retargeted trajectory
     if config.save_info and len(info_list) > 0:
         info_aggregated = {}
         for k in info_list[0].keys():
             info_aggregated[k] = np.stack([info[k] for info in info_list], axis=0)
-        np.savez(f"{config.output_dir}/pos_rew_scale{config.pos_rew_scale}_horizon{config.horizon}_maxnumiter{config.max_num_iterations}_trajectory_mjwp.npz", **info_aggregated)
-        loguru.logger.info(f"Saved info to {config.output_dir}/pos_rew_scale{config.pos_rew_scale}_horizon{config.horizon}_maxnumiter{config.max_num_iterations}_trajectory_mjwp.npz")
+        np.savez(f"{config.output_dir}/{save_name}_trajectory_mjwp.npz", **info_aggregated)
+        loguru.logger.info(f"Saved info to {config.output_dir}/{save_name}_trajectory_mjwp.npz")
 
     # save video
     if config.save_video and len(images) > 0:
-        video_path = f"{config.output_dir}/pos_rew_scale{config.pos_rew_scale}_horizon{config.horizon}_maxnumiter{config.max_num_iterations}_visualization_mjwp.mp4"
+        video_path = f"{config.output_dir}/{save_name}_visualization_mjwp.mp4"
         imageio.mimsave(
             video_path,
             images,
