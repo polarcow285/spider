@@ -54,7 +54,11 @@ def load_data(
             "ctrl data not found, using 'qpos' as a initial guess for control."
         )
         if config.embodiment_type in ["bimanual", "right", "left"]:
-            ctrl_ref = qpos_ref[:, : -config.nq_obj]
+            # TODO make a better way when an object is articulated
+            if config.task in ['scissors']:
+                ctrl_ref = qpos_ref[:, : -8] # 8 because object is articulated (1 extra joint)
+            else:
+                ctrl_ref = qpos_ref[:, : -config.nq_obj]
         elif config.embodiment_type in ["CMU", "DanceDB"]:
             ctrl_ref = qpos_ref[:, 7:]
         else:

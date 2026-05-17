@@ -15,8 +15,6 @@ Keys: ['qpos_wrist_right', 'qpos_finger_right', 'qpos_wrist_left', 'qpos_finger_
     qpos_wrist_right: shape=(T, 7), dtype=float32
     qpos_finger_right: shape=(T, 5, 7), dtype=float32 (5 fingertips)
     qpos_obj_right: shape=(T, 7), dtype=float32
-    'fps': 120.0,                  # Frame rate
-    'task_name': 'screwdriver',
 
 """
 import io
