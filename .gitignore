@@ -220,6 +220,12 @@ example_datasets/processed/arctic/*
 !example_datasets/processed/arctic/leap
 !example_datasets/processed/arctic/leap**
 
+!example_datasets/processed/arctic/mano
+!example_datasets/processed/arctic/mano**
+
+!example_datasets/processed/arctic/wuji
+!example_datasets/processed/arctic/wuji**
+
 
 example_datasets/raw/*
 !example_datasets/raw/custom/

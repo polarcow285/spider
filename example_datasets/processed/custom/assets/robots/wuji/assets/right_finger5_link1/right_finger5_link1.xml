@@ -1,0 +1,24 @@
+<mujoco model="right_finger5_link1">
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <mesh file="right_finger5_link1.obj"/>
+    <mesh file="right_finger5_link1_collision_0.obj"/>
+    <mesh file="right_finger5_link1_collision_1.obj"/>
+    <mesh file="right_finger5_link1_collision_2.obj"/>
+  </asset>
+  <worldbody>
+    <body name="right_finger5_link1">
+      <geom mesh="right_finger5_link1" class="visual"/>
+      <geom mesh="right_finger5_link1_collision_0" rgba="0.4610882673321377 0.901755091241457 0.7807836830360563 1" class="collision"/>
+      <geom mesh="right_finger5_link1_collision_1" rgba="0.5406945758422028 0.2637549747351946 0.3148341599000406 1" class="collision"/>
+      <geom mesh="right_finger5_link1_collision_2" rgba="0.41224816387255436 0.8660796802260999 0.7411383507552384 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>
