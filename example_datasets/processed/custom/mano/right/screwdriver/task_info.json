@@ -1,0 +1,10 @@
+{
+  "task": "screwdriver",
+  "dataset_name": "custom",
+  "robot_type": "mano",
+  "embodiment_type": "right",
+  "data_id": 0,
+  "right_object_mesh_dir": "C:\\Users\\mmoop\\Code\\spider\\example_datasets\\processed\\custom\\assets\\objects\\screwdriver",
+  "left_object_mesh_dir": null,
+  "ref_dt": 0.02
+}

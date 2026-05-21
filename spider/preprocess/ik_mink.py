@@ -4,7 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Run IK for the given hand type and mode.
+"""Run IK for the given hand type and mode. Using mink so that the joints don't "bend backwards"
 
 Input data format: npz file which contains qpos for key frames.
 
@@ -12,6 +12,11 @@ TODO: for enable collision, first use non collision as initial guess
 
 Author: Chaoyi Pan
 Date: 2025-07-06
+
+Increased posture regularization from a tiny fixed 1e-3 to a CLI parameter: posture_cost, default 1.0.
+Each frame now uses the current solved pose as a posture prior before solving the next frame, so the IK prefers the same joint branch instead of jumping/flipping.
+Added per-joint velocity clipping with max_joint_velocity, default 8.0 rad/s, while leaving free bodies unconstrained.
+Added ik_substeps_per_frame, default 20, so the solver takes smaller smoother steps between keyframes.
 """
 
 import os
@@ -21,6 +26,8 @@ import mujoco
 import mujoco.viewer
 import numpy as np
 import tyro
+from mink import Configuration, FrameTask, PostureTask, solve_ik
+from mink.lie import SE3
 from loop_rate_limiters import RateLimiter
 from mujoco import MjSpec
 from omegaconf import DictConfig, OmegaConf
@@ -93,6 +100,8 @@ def add_mocap_bodies(
                 torque_scale = 1.0
 
             constraint_data = np.zeros(11)
+            if eq_type == mujoco.mjtEq.mjEQ_WELD:
+                constraint_data[3] = 1.0
             constraint_data[10] = torque_scale
             e = mjspec.add_equality(
                 name=f"{b1}_{b2}_equality_constraint",
@@ -194,6 +203,105 @@ def print_script_qpos_order(index_map):
     print("=================================================\n")
 
 
+def qpos_pose_to_se3(qpos_pose: np.ndarray) -> SE3:
+    """Convert [x, y, z, qw, qx, qy, qz] target data to a Mink SE3."""
+    mat = np.eye(4)
+    rot = np.zeros(9)
+    quat = qpos_pose[3:].copy()
+    quat /= np.linalg.norm(quat)
+    mujoco.mju_quat2Mat(rot, quat)
+    mat[:3, :3] = rot.reshape(3, 3)
+    mat[:3, 3] = qpos_pose[:3]
+    return SE3.from_matrix(mat)
+
+
+def make_mink_tasks(
+    sites_for_mimic: list[str],
+    model: mujoco.MjModel,
+    posture_cost: float,
+):
+    tasks = {}
+    for site_name in sites_for_mimic:
+        if "wrist" in site_name or "object" in site_name:
+            tasks[site_name] = FrameTask(
+                frame_name=site_name,
+                frame_type="site",
+                position_cost=50.0,
+                orientation_cost=10.0,
+            )
+        else:
+            tasks[site_name] = FrameTask(
+                frame_name=site_name,
+                frame_type="site",
+                position_cost=20.0,
+                orientation_cost=0.0,
+            )
+    posture_task = PostureTask(model, cost=posture_cost)
+    return tasks, posture_task
+
+
+def set_mink_targets(
+    tasks: dict[str, FrameTask],
+    index_map: dict,
+    qpos_ref: np.ndarray,
+    frame_idx: int,
+):
+    for site_name, task in tasks.items():
+        qpos_idx = index_map[site_name]["qpos_idx"]
+        task.set_target(qpos_pose_to_se3(qpos_ref[frame_idx, qpos_idx]))
+
+
+def solve_mink_velocity(configuration: Configuration, tasks: list, dt: float):
+    try:
+        return solve_ik(
+            configuration,
+            tasks,
+            dt=dt,
+            damping=1e-4,
+            safety_break=False,
+        )
+    except TypeError:
+        last_error = None
+        for solver in ("quadprog", "proxqp", "osqp"):
+            try:
+                return solve_ik(
+                    configuration,
+                    tasks,
+                    dt=dt,
+                    solver=solver,
+                    damping=1e-4,
+                    safety_break=False,
+                )
+            except Exception as exc:
+                last_error = exc
+        raise last_error
+
+
+def clip_joint_velocity(
+    model: mujoco.MjModel,
+    velocity: np.ndarray,
+    max_joint_velocity: float,
+):
+    """Limit hinge/slide/ball joint speed while leaving free bodies unconstrained."""
+    velocity = velocity.copy()
+    for jid in range(model.njnt):
+        jnt_type = model.jnt_type[jid]
+        if jnt_type == mujoco.mjtJoint.mjJNT_FREE:
+            continue
+
+        dof_addr = model.jnt_dofadr[jid]
+        if jnt_type == mujoco.mjtJoint.mjJNT_BALL:
+            dof_size = 3
+        else:
+            dof_size = 1
+        velocity[dof_addr : dof_addr + dof_size] = np.clip(
+            velocity[dof_addr : dof_addr + dof_size],
+            -max_joint_velocity,
+            max_joint_velocity,
+        )
+    return velocity
+
+
 # parameters
 def main(
     dataset_dir: str = f"{ROOT}/../example_datasets",
@@ -206,7 +314,7 @@ def main(
     enable_collision: bool = False,
     start_idx: int = 0,
     end_idx: int = -1,
-    sim_dt: float = 0.002, #0.01,
+    sim_dt: float = 0.002, # 0.01,
     ref_dt: float = 0.02,
     data_id: int = 0,
     open_hand: bool = False,
@@ -219,6 +327,10 @@ def main(
     average_frame_size: int = 3,
     aggregate_contact: bool = True,
     z_offset: float = 0.0,
+    posture_cost: float = 1.0,
+    max_joint_velocity: float = 8.0,
+    ik_substeps_per_frame: int = 20,
+    visualization_fps: int = 120,
 ):
     # resolved processed directories
     dataset_dir = os.path.abspath(dataset_dir)
@@ -241,7 +353,6 @@ def main(
     os.makedirs(processed_dir_robot, exist_ok=True)
     # load model from processed scene
     model_path = f"{processed_dir_robot}/../scene.xml"
-    print(f"Loading model from {model_path}")
     # NOTE: sites in robot should follow the order of the xml file
     sites_in_robot = get_robot_sites(robot_type, embodiment_type)
 
@@ -253,10 +364,6 @@ def main(
     qpos_wrist_left = loaded_data["qpos_wrist_left"][start_idx:end_idx]
     qpos_obj_right = loaded_data["qpos_obj_right"][start_idx:end_idx]
     qpos_obj_left = loaded_data["qpos_obj_left"][start_idx:end_idx]
-    obj_arti = loaded_data["obj_arti"][start_idx:end_idx]
-
-    obj_right_all = np.concatenate([qpos_obj_right, obj_arti], axis=1)
-
     try:
         contact_left = loaded_data["contact_left"][start_idx:end_idx]
         contact_right = loaded_data["contact_right"][start_idx:end_idx]
@@ -415,14 +522,14 @@ def main(
     mj_spec = mujoco.MjSpec.from_file(model_path)
 
     # ================================
-    # add constraints to the free body
+    # add target mocap bodies for visualization
     # ================================
     mjspec = add_mocap_bodies(
         mj_spec,
         sites_for_mimic,
         target_mocap_bodies,
         robot_conf,
-        add_equality_constraint=True,
+        add_equality_constraint=False,
     )
 
     # ================================
@@ -461,7 +568,13 @@ def main(
     if not enable_collision:
         mj_model_ik.opt.disableflags |= mujoco.mjtDisableBit.mjDSBL_CONTACT
     mj_model_ik.opt.disableflags |= mujoco.mjtDisableBit.mjDSBL_ACTUATION
-    mj_data_ik = mujoco.MjData(mj_model_ik)
+    configuration = Configuration(mj_model_ik)
+    mj_data_ik = configuration.data
+    mink_tasks, posture_task = make_mink_tasks(
+        sites_for_mimic,
+        mj_model_ik,
+        posture_cost=posture_cost,
+    )
 
     # update index_map
     for target_mocap_body in target_mocap_bodies:
@@ -478,17 +591,13 @@ def main(
         mj_data_ik.qpos[-14:-7] = qpos_obj_right[0]
         mj_data_ik.qpos[-7:] = qpos_obj_left[0]
     elif embodiment_type == "right":
-        # TODO will this break because there are two?
-        j_obj = mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_BODY, "bottom")
+        j_obj = mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_BODY, "bottom_visual")
         jnt_adr = mj_model.body_jntadr[j_obj]
         mj_data_ik.qpos[jnt_adr:jnt_adr+7] = qpos_obj_right[0]
-
-        scissors_hinge_jid = mujoco.mj_name2id(mj_model_ik, mujoco.mjtObj.mjOBJ_JOINT, "scissors_joint")
-        scissors_hinge_qadr = mj_model_ik.jnt_qposadr[scissors_hinge_jid]
-
-        mj_data_ik.qpos[scissors_hinge_qadr] = obj_arti[0, 0]
     elif embodiment_type == "left":
         mj_data_ik.qpos[-7:] = qpos_obj_left[0]
+    configuration.update(mj_data_ik.qpos)
+    posture_task.set_target(configuration.q)
 
     # set the mocap sites to the tip positions
     # for i, site_id in enumerate(site_ids):
@@ -501,8 +610,9 @@ def main(
         mj_data_ik.mocap_quat[mocap_id] = qpos_ref[0, mano_id, 3:]
 
     # rollout mujoco
-    # reference dt inferred from MANO keypoint data spacing if available; default to 0.02
-    rate_limiter = RateLimiter(1 / ref_dt)
+    # Keep trajectory integration on ref_dt, but preview video/viewer at the
+    # dataset visualization rate so it does not look artificially slowed down.
+    rate_limiter = RateLimiter(visualization_fps)
     H = qpos_finger_right.shape[0]
     cnt = 0
     if save_video:
@@ -543,63 +653,21 @@ def main(
             if cnt == 0:
                 # reset distance cost
                 cost_sum = 0.0
-                # reset data buffer
-                best_qpos_init = np.zeros(mj_model_ik.nq)
-                best_qpos_diff_sum = np.inf
-                for i in range(max_num_initial_guess):
-                    mj_data_ik.qpos[:] = np.random.rand(mj_model_ik.nq)
-                    mj_data_ik.qvel[:] = np.zeros(mj_model_ik.nv)
-                    mj_data_ik.ctrl[:] = np.random.rand(mj_model_ik.nu)
-                    mocap_id_list = []
-                    qpos_id_list = []
-                    for k, v in index_map.items():
-                        if v["mocap_idx"] != -1:
-                            mocap_idx = v["mocap_idx"]
-                            qpos_idx = v["qpos_idx"]
-                            mj_data_ik.mocap_pos[mocap_idx] = qpos_ref[
-                                cnt, qpos_idx, :3
-                            ]
-                            if "tip" in k:
-                                mj_data_ik.mocap_pos[mocap_idx] += (
-                                    np.random.randn(3) * 0.002
-                                )
-                            mj_data_ik.mocap_quat[mocap_idx] = qpos_ref[
-                                cnt, qpos_idx, 3:
-                            ]
-                    # nq_obj = 14 if embodiment_type == "bimanual" else 7
-                    nq_obj = 8 # because the object is articulated
-                    qpos_diff_sum = 0.0
-
-                    for i in range(30):
-                        # In our xml, the object is first
-                        mj_data_ik.ctrl[:] = mj_data_ik.qpos[:-nq_obj].copy()
-                        mujoco.mj_step(mj_model_ik, mj_data_ik)
-                    # compute mocap diff
-                    for mocap_id, qpos_id in zip(
-                        mocap_id_list, qpos_id_list, strict=False
-                    ):
-                        mocap_pos = mj_data_ik.mocap_pos[mocap_id]
-                        mocap_quat = mj_data_ik.mocap_quat[mocap_id]
-                        qpos_pos = qpos_ref[cnt, qpos_id, :3]
-                        qpos_quat = qpos_ref[cnt, qpos_id, 3:]
-                        mocap_diff = np.linalg.norm(mocap_pos - qpos_pos)
-                        qpos_diff = np.linalg.norm(mocap_quat - qpos_quat)
-                        qpos_diff_sum += mocap_diff + qpos_diff
-                    mj_data.qpos[:] = mj_data_ik.qpos.copy()
-                    mj_data.qvel[:] = mj_data_ik.qvel.copy() * 0.0
-                    mj_data.ctrl[:] = mj_data_ik.qpos[:-nq_obj].copy()
-                    mujoco.mj_forward(mj_model, mj_data)
-                    for i in range(30):
-                        mujoco.mj_step(mj_model, mj_data)
-                        qpos_diff_sum += np.linalg.norm(mj_data.qpos - mj_data_ik.qpos)
-                    if qpos_diff_sum < best_qpos_diff_sum:
-                        best_qpos_init = mj_data_ik.qpos.copy()
-                        best_qpos_diff_sum = qpos_diff_sum
-                loguru.logger.info(f"best_qpos_diff_sum: {best_qpos_diff_sum}")
-                mj_data_ik.qpos[:] = best_qpos_init
+                nq_obj = 14 if embodiment_type == "bimanual" else 7
+                set_mink_targets(mink_tasks, index_map, qpos_ref, cnt)
+                posture_task.set_target(configuration.q.copy())
+                task_list = list(mink_tasks.values()) + [posture_task]
+                init_steps = max(ik_substeps_per_frame, max(1, max_num_initial_guess) * 10)
+                for _ in range(init_steps):
+                    vel = solve_mink_velocity(configuration, task_list, sim_dt)
+                    vel = clip_joint_velocity(
+                        mj_model_ik,
+                        vel,
+                        max_joint_velocity=max_joint_velocity,
+                    )
+                    configuration.integrate_inplace(vel, sim_dt)
+                    mj_data_ik.qvel[:] = vel
                 mj_data_ik.qvel[:] = 0.0
-                mj_data_ik.ctrl[:] = mj_data_ik.qpos[:-nq_obj].copy()
-                mujoco.mj_step(mj_model_ik, mj_data_ik)
                 qpos_list = []
                 contact_pos_list = []
                 contact_list = []
@@ -614,20 +682,26 @@ def main(
                         cnt, v["qpos_idx"], 3:
                     ]
 
-            for _ in range(max(1, int(ref_dt / sim_dt))):
-                mj_data_ik.qpos[
-                    scissors_hinge_qadr
-                ] = obj_arti[cnt, 0]
-                mujoco.mj_step(mj_model_ik, mj_data_ik)
+            set_mink_targets(mink_tasks, index_map, qpos_ref, cnt)
+            posture_task.set_target(configuration.q.copy())
+            task_list = list(mink_tasks.values()) + [posture_task]
+            num_ik_substeps = max(1, ik_substeps_per_frame, int(ref_dt / sim_dt))
+            ik_dt = ref_dt / num_ik_substeps
+            for _ in range(num_ik_substeps):
+                vel = solve_mink_velocity(configuration, task_list, ik_dt)
+                vel = clip_joint_velocity(
+                    mj_model_ik,
+                    vel,
+                    max_joint_velocity=max_joint_velocity,
+                )
+                configuration.integrate_inplace(vel, ik_dt)
+                mj_data_ik.qvel[:] = vel
+            mujoco.mj_forward(mj_model_ik, mj_data_ik)
 
             # set site position and set it to ref mocap position (use original mj_model and mj_data)
             mj_data.qpos[:] = mj_data_ik.qpos.copy()
-            mj_data.qpos[
-                scissors_hinge_qadr
-            ] = obj_arti[cnt, 0]
             mj_data.qvel[:] = 0.0
             nq_obj = 14 if embodiment_type == "bimanual" else 7
-            nq_obj = 8 # because the object is articulated
             mj_data.ctrl[:] = mj_data_ik.qpos[:-nq_obj].copy()
 
             # override joint position according to contact state
@@ -651,8 +725,16 @@ def main(
                                     "right": first_contact_frame_right,
                                     "left": first_contact_frame_left,
                                 }
-                                data["qpos_obj_right"][start_idx:end_idx]
-                                qpos_obj_left = loaded_d_idx = finger_map[finger]
+                                finger_map = {
+                                    "thumb": 0,
+                                    "index": 1,
+                                    "middle": 2,
+                                    "ring": 3,
+                                    "pinky": 4,
+                                }
+
+                                contact_frame_list = side_map[side]
+                                finger_idx = finger_map[finger]
                                 contact_frame = contact_frame_list[finger_idx]
 
                                 # Use smooth transition with clipping
@@ -765,7 +847,7 @@ def main(
                     return sorted(mapping, key=lambda x: x[0])
 
 
-                print("\n========== FULL 30D qpos decoding ==========\n")
+                print("\n========== FULL qpos decoding ==========\n")
                 mapping = decode_qpos(mj_model)
                 for idx, label in mapping:
                     print(f"qpos[{idx:02d}] → {label}")
@@ -785,7 +867,7 @@ def main(
             imageio.mimsave(
                 f"{file_dir}/visualization_ik.mp4",
                 images,
-                fps=int(1 / ref_dt),
+                fps=visualization_fps,
             )
             loguru.logger.info(
                 f"Saved visualization video to {file_dir}/visualization_ik.mp4"

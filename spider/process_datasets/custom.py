@@ -20,6 +20,8 @@ Keys: ['qpos_wrist_right', 'qpos_finger_right', 'qpos_wrist_left', 'qpos_finger_
 import io
 import json
 import os
+from contextlib import contextmanager
+
 import h5py
 import numpy as np
 import tyro
@@ -40,7 +42,7 @@ def main(
 ):
     dataset_dir = os.path.abspath(dataset_dir)
     # file_path = f"{dataset_dir}/raw/custom/{task}_{embodiment_type}.h5"
-    file_path = f"{dataset_dir}/raw/custom/zed_mocap_demo_0318_screwdriver_1.5x.h5"
+    file_path = f"{dataset_dir}/raw/arctic/demo_human_scale.h5"
     output_dir = get_processed_data_dir(
         dataset_dir=dataset_dir,
         dataset_name="custom",
@@ -52,13 +54,21 @@ def main(
     os.makedirs(output_dir, exist_ok=True)
 
     # task info
+    right_object_mesh_dir = os.path.join(
+        dataset_dir,
+        "processed",
+        "custom",
+        "assets",
+        "objects",
+        "screwdriver",
+    )
     task_info = {
         "task": task,
         "dataset_name": "custom",
         "robot_type": "mano",
         "embodiment_type": embodiment_type,
         "data_id": 0,
-        "right_object_mesh_dir": None,
+        "right_object_mesh_dir": right_object_mesh_dir,
         "left_object_mesh_dir": None,
         "ref_dt": 0.02,
     }
@@ -104,6 +114,11 @@ def main(
     )
     loguru.logger.info(f"Saved qpos to {output_dir}/trajectory_keypoints.npz")
 
+    task_info_path = f"{output_dir}/../task_info.json"
+    with open(task_info_path, "w") as f:
+        json.dump(task_info, f, indent=2)
+    loguru.logger.info(f"Saved task_info to {task_info_path}")
+
     qpos_list = np.concatenate(
         [
             qpos_wrist_right[:, None],
@@ -133,7 +148,7 @@ def main(
     if embodiment_type in ["right", "bimanual"]:
         mj_spec.add_mesh(
             name="right_object",
-            file=f"/home/nl455/spider/example_datasets/processed/custom/assets/objects/screwdriver/screwdriver.obj",
+            file=os.path.join(right_object_mesh_dir, "screwdriver.obj"),
         )
         object_right_handle.add_geom(
             name="right_object",

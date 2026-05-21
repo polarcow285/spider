@@ -9,6 +9,7 @@ matplotlib==3.10.7
 imageio[ffmpeg]==2.37.2
 imageio-ffmpeg==0.6.0
 opencv-python==4.11.0.86
+mink==1.1.0
 rerun-sdk==0.26.2
 ipdb==0.13.13
 pymeshlab==2025.7

@@ -93,6 +93,8 @@ def add_mocap_bodies(
                 torque_scale = 1.0
 
             constraint_data = np.zeros(11)
+            if eq_type == mujoco.mjtEq.mjEQ_WELD:
+                constraint_data[3] = 1.0
             constraint_data[10] = torque_scale
             e = mjspec.add_equality(
                 name=f"{b1}_{b2}_equality_constraint",
@@ -206,7 +208,7 @@ def main(
     enable_collision: bool = False,
     start_idx: int = 0,
     end_idx: int = -1,
-    sim_dt: float = 0.01,
+    sim_dt: float = 0.002, # 0.01,
     ref_dt: float = 0.02,
     data_id: int = 0,
     open_hand: bool = False,
@@ -293,8 +295,6 @@ def main(
     # load model
     mj_model = mujoco.MjModel.from_xml_path(model_path)
     mj_model.opt.timestep = sim_dt
-    target_z = qpos_ref[:, :, 2]
-    relax_model_tracking_limits(mj_model, float(target_z.min()), float(target_z.max()))
     mj_data = mujoco.MjData(mj_model)
     print_mj_qpos_layout(mj_model)
 
@@ -748,7 +748,7 @@ def main(
                     return sorted(mapping, key=lambda x: x[0])
 
 
-                print("\n========== FULL 29D qpos decoding ==========\n")
+                print("\n========== FULL qpos decoding ==========\n")
                 mapping = decode_qpos(mj_model)
                 for idx, label in mapping:
                     print(f"qpos[{idx:02d}] → {label}")

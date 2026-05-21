@@ -18,6 +18,7 @@ dependencies = [
   "matplotlib",
   "imageio[ffmpeg]",
   "opencv-python",
+  "mink>=1.1.0",
   "newton[examples] @ git+https://github.com/newton-physics/newton.git",
   "rerun-sdk",
   "ipdb",
