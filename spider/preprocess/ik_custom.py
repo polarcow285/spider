@@ -293,6 +293,8 @@ def main(
     # load model
     mj_model = mujoco.MjModel.from_xml_path(model_path)
     mj_model.opt.timestep = sim_dt
+    target_z = qpos_ref[:, :, 2]
+    relax_model_tracking_limits(mj_model, float(target_z.min()), float(target_z.max()))
     mj_data = mujoco.MjData(mj_model)
     print_mj_qpos_layout(mj_model)
 
