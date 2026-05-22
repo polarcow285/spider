@@ -331,6 +331,9 @@ def main(
     max_joint_velocity: float = 8.0,
     ik_substeps_per_frame: int = 20,
     visualization_fps: int = 120,
+    articulated: bool = False,
+    articulated_joint_name: str = "scissors_joint",
+    articulated_body_name: str = "bottom",
 ):
     # resolved processed directories
     dataset_dir = os.path.abspath(dataset_dir)
@@ -364,6 +367,15 @@ def main(
     qpos_wrist_left = loaded_data["qpos_wrist_left"][start_idx:end_idx]
     qpos_obj_right = loaded_data["qpos_obj_right"][start_idx:end_idx]
     qpos_obj_left = loaded_data["qpos_obj_left"][start_idx:end_idx]
+    obj_arti = None
+    if articulated:
+        if "obj_arti" not in loaded_data:
+            raise ValueError(
+                "articulated=True requires `obj_arti` in trajectory_keypoints.npz"
+            )
+        obj_arti = loaded_data["obj_arti"][start_idx:end_idx]
+        if obj_arti.ndim == 1:
+            obj_arti = obj_arti[:, None]
     try:
         contact_left = loaded_data["contact_left"][start_idx:end_idx]
         contact_right = loaded_data["contact_right"][start_idx:end_idx]
@@ -575,6 +587,21 @@ def main(
         mj_model_ik,
         posture_cost=posture_cost,
     )
+    articulated_qadr = None
+    if articulated:
+        articulated_jid = mujoco.mj_name2id(
+            mj_model_ik,
+            mujoco.mjtObj.mjOBJ_JOINT,
+            articulated_joint_name,
+        )
+        if articulated_jid == -1:
+            raise ValueError(
+                f"Could not find articulated joint `{articulated_joint_name}`"
+            )
+        articulated_qadr = mj_model_ik.jnt_qposadr[articulated_jid]
+    nq_obj = 14 if embodiment_type == "bimanual" else 7
+    if articulated:
+        nq_obj += obj_arti.shape[1]
 
     # update index_map
     for target_mocap_body in target_mocap_bodies:
@@ -591,11 +618,20 @@ def main(
         mj_data_ik.qpos[-14:-7] = qpos_obj_right[0]
         mj_data_ik.qpos[-7:] = qpos_obj_left[0]
     elif embodiment_type == "right":
-        j_obj = mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_BODY, "bottom_visual")
+        body_name = articulated_body_name if articulated else "bottom_visual"
+        j_obj = mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_BODY, body_name)
+        if j_obj == -1 and not articulated:
+            j_obj = mujoco.mj_name2id(mj_model, mujoco.mjtObj.mjOBJ_BODY, "bottom")
+        if j_obj == -1:
+            raise ValueError(f"Could not find object body `{body_name}`")
         jnt_adr = mj_model.body_jntadr[j_obj]
         mj_data_ik.qpos[jnt_adr:jnt_adr+7] = qpos_obj_right[0]
     elif embodiment_type == "left":
         mj_data_ik.qpos[-7:] = qpos_obj_left[0]
+    if articulated:
+        mj_data_ik.qpos[
+            articulated_qadr : articulated_qadr + obj_arti.shape[1]
+        ] = obj_arti[0]
     configuration.update(mj_data_ik.qpos)
     posture_task.set_target(configuration.q)
 
@@ -653,11 +689,13 @@ def main(
             if cnt == 0:
                 # reset distance cost
                 cost_sum = 0.0
-                nq_obj = 14 if embodiment_type == "bimanual" else 7
                 set_mink_targets(mink_tasks, index_map, qpos_ref, cnt)
                 posture_task.set_target(configuration.q.copy())
                 task_list = list(mink_tasks.values()) + [posture_task]
-                init_steps = max(ik_substeps_per_frame, max(1, max_num_initial_guess) * 10)
+                init_steps = max(
+                    ik_substeps_per_frame,
+                    max(1, max_num_initial_guess) * 10,
+                )
                 for _ in range(init_steps):
                     vel = solve_mink_velocity(configuration, task_list, sim_dt)
                     vel = clip_joint_velocity(
@@ -666,6 +704,11 @@ def main(
                         max_joint_velocity=max_joint_velocity,
                     )
                     configuration.integrate_inplace(vel, sim_dt)
+                    if articulated:
+                        mj_data_ik.qpos[
+                            articulated_qadr : articulated_qadr + obj_arti.shape[1]
+                        ] = obj_arti[cnt]
+                        configuration.update(mj_data_ik.qpos)
                     mj_data_ik.qvel[:] = vel
                 mj_data_ik.qvel[:] = 0.0
                 qpos_list = []
@@ -695,13 +738,21 @@ def main(
                     max_joint_velocity=max_joint_velocity,
                 )
                 configuration.integrate_inplace(vel, ik_dt)
+                if articulated:
+                    mj_data_ik.qpos[
+                        articulated_qadr : articulated_qadr + obj_arti.shape[1]
+                    ] = obj_arti[cnt]
+                    configuration.update(mj_data_ik.qpos)
                 mj_data_ik.qvel[:] = vel
             mujoco.mj_forward(mj_model_ik, mj_data_ik)
 
             # set site position and set it to ref mocap position (use original mj_model and mj_data)
             mj_data.qpos[:] = mj_data_ik.qpos.copy()
+            if articulated:
+                mj_data.qpos[
+                    articulated_qadr : articulated_qadr + obj_arti.shape[1]
+                ] = obj_arti[cnt]
             mj_data.qvel[:] = 0.0
-            nq_obj = 14 if embodiment_type == "bimanual" else 7
             mj_data.ctrl[:] = mj_data_ik.qpos[:-nq_obj].copy()
 
             # override joint position according to contact state

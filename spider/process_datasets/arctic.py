@@ -168,13 +168,13 @@ def main(
         mj_spec.add_mesh(
             name="scissors_top",
             file=top_mesh_path,
-            scale=[0.002, 0.002, 0.002],
+            scale=[0.001, 0.001, 0.001],
         )
 
         mj_spec.add_mesh(
             name="scissors_bottom",
             file=bottom_mesh_path,
-            scale=[0.002, 0.002, 0.002],
+            scale=[0.001, 0.001, 0.001],
         )
 
         scissors_root = object_right_handle.add_body(

@@ -93,7 +93,7 @@
     <mesh name="right_finger5_link4_cd_right_finger5_link4_collision_1" file="robots/wuji/assets/right_finger5_link4/right_finger5_link4_collision_1.obj" />
 
     <!-- Meshes -->
-    <mesh name="top_visual" file="objects/scissors/top.obj" scale="0.002 0.002 0.002"/>
+    <mesh name="top_visual" file="objects/scissors/top.obj" scale="0.001 0.001 0.001"/>
     <mesh name="top_collision_0" file="objects/scissors/top_simplified/top_simplified_part_000.obj" scale="0.6666667 0.6666667 0.6666667"/>
     <mesh name="top_collision_1" file="objects/scissors/top_simplified/top_simplified_part_001.obj" scale="0.6666667 0.6666667 0.6666667"/>
     <mesh name="top_collision_2" file="objects/scissors/top_simplified/top_simplified_part_002.obj" scale="0.6666667 0.6666667 0.6666667"/>
@@ -112,7 +112,7 @@
     <mesh name="top_collision_15" file="objects/scissors/top_simplified/top_simplified_part_015.obj" scale="0.6666667 0.6666667 0.6666667"/>
     <mesh name="top_collision_16" file="objects/scissors/top_simplified/top_simplified_part_016.obj" scale="0.6666667 0.6666667 0.6666667"/>
 
-    <mesh name="bottom_visual" file="objects/scissors/bottom.obj" scale="0.002 0.002 0.002"/>
+    <mesh name="bottom_visual" file="objects/scissors/bottom.obj" scale="0.001 0.001 0.001"/>
     <mesh name="bottom_collision_0" file="objects/scissors/bottom_simplified/bottom_simplified_part_000.obj" scale="0.6666667 0.6666667 0.6666667"/>
     <mesh name="bottom_collision_1" file="objects/scissors/bottom_simplified/bottom_simplified_part_001.obj" scale="0.6666667 0.6666667 0.6666667"/>
     <mesh name="bottom_collision_2" file="objects/scissors/bottom_simplified/bottom_simplified_part_002.obj" scale="0.6666667 0.6666667 0.6666667"/>
