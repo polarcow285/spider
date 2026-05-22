@@ -86,13 +86,35 @@ def _compile_step(
 # --
 
 
+def _apply_contact_solparams_to_collision_geoms(
+    model: mujoco.MjModel,
+    solref: tuple[float, float],
+    solimp: tuple[float, float, float, float, float],
+) -> None:
+    """Same as mjwp.apply_contact_solparams_to_collision_geoms (mjwarp lacks OVERRIDE)."""
+    sr = np.array(solref, dtype=np.float64)
+    si = np.array(solimp, dtype=np.float64)
+    for gid in range(model.ngeom):
+        if model.geom_contype[gid] == 0 and model.geom_conaffinity[gid] == 0:
+            continue
+        model.geom_solref[gid] = sr
+        model.geom_solimp[gid] = si
+
+
 def setup_mj_model(config: Config) -> mujoco.MjModel:
     model_cpu = mujoco.MjModel.from_xml_path(config.model_path)
     model_cpu.opt.timestep = float(config.sim_dt)
     model_cpu.opt.iterations = 20
     model_cpu.opt.ls_iterations = 50
-    model_cpu.opt.o_solref = [0.02, 1.0]
-    model_cpu.opt.o_solimp = [0.9, 0.95, 0.001, 0.5, 2]
+    model_cpu.opt.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
+    if getattr(config, "mjwp_override_geom_contact_sol", True):
+        model_cpu.opt.o_solref = [0.02, 1.0]
+        model_cpu.opt.o_solimp = [0.9, 0.95, 0.001, 0.5, 2]
+        _apply_contact_solparams_to_collision_geoms(
+            model_cpu,
+            (0.02, 1.0),
+            (0.9, 0.95, 0.001, 0.5, 2.0),
+        )
     return model_cpu
 
 

@@ -1,0 +1,48 @@
+dgx2-compute-03.coecis.cornell.edu
+Fri May 15 17:02:21 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.126.09             Driver Version: 580.126.09     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  Tesla V100-SXM3-32GB-H         On  |   00000000:34:00.0 Off |                    0 |
+| N/A   27C    P0             31W /  450W |       0MiB /  32768MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+/share/culbertson/nl455/miniconda3/envs/spider/lib/python3.12/site-packages/torch/cuda/__init__.py:182: UserWarning: CUDA initialization: Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 802: system not yet initialized (Triggered internally at /pytorch/c10/cuda/CUDAFunctions.cpp:119.)
+  return torch._C._cuda_getDeviceCount() > 0
+Warp CUDA error 802: system not yet initialized (in function init_cuda_driver, /builds/omniverse/warp/warp/native/cuda_util.cpp:282)
+Warp DeprecationWarning: The namespace `warp.context` will soon be removed from the public API. It can still be accessed from `warp._src.context` but might be changed or removed without notice.
+Warp DeprecationWarning: The symbol `warp.context.Module` will soon be removed from the public API. Use `warp.Module` instead.
+Warp DeprecationWarning: The symbol `warp.context.get_module` will soon be removed from the public API. Use `warp.get_module` instead.
+Warp DeprecationWarning: The namespace `warp.math` will soon be removed from the public API. It can still be accessed from `warp._src.math` but might be changed or removed without notice.
+Warp 1.11.0 initialized:
+   CUDA driver not found or failed to initialize
+   Devices:
+     "cpu"      : "x86_64"
+   Kernel cache:
+     /home/nl455/.cache/warp/1.11.0
+Error executing job with overrides: ['num_samples=3072']
+Traceback (most recent call last):
+  File "/share/culbertson/nl455/spider/examples/run_mjwp.py", line 335, in run_main
+    main(config)
+  File "/share/culbertson/nl455/spider/examples/run_mjwp.py", line 118, in main
+    config = process_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/share/culbertson/nl455/spider/spider/config.py", line 240, in process_config
+    model = mujoco.MjModel.from_xml_path(config.model_path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Error: at least 4 vertices required
+Element name 'palm', id 0, line 14
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.

@@ -1,0 +1,1328 @@
+duchin-compute-01.cis.cornell.edu
+Fri May 15 01:40:50 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.124.06             Driver Version: 570.124.06     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA RTX 6000 Ada Gene...    On  |   00000000:01:00.0 Off |                  Off |
+| 30%   42C    P8             31W /  300W |       2MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+Warp DeprecationWarning: The namespace `warp.context` will soon be removed from the public API. It can still be accessed from `warp._src.context` but might be changed or removed without notice.
+Warp DeprecationWarning: The symbol `warp.context.Module` will soon be removed from the public API. Use `warp.Module` instead.
+Warp DeprecationWarning: The symbol `warp.context.get_module` will soon be removed from the public API. Use `warp.get_module` instead.
+Warp DeprecationWarning: The namespace `warp.math` will soon be removed from the public API. It can still be accessed from `warp._src.math` but might be changed or removed without notice.
+Warp 1.11.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX 6000 Ada Generation" (47 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /home/nl455/.cache/warp/1.11.0
+2026-05-15 01:41:00.701 | WARNING  | spider.config:process_config:261 - task_info.json not found at /share/culbertson/nl455/spider/example_datasets/processed/custom/leap/right/screwdriver/0/../task_info.json, using default values
+2026-05-15 01:41:00.707 | WARNING  | spider.io:load_data:53 - ctrl data not found, using 'qpos' as a initial guess for control.
+2026-05-15 01:41:04.185 | INFO     | spider.viewers:setup_viewer:85 - viewer is set to rerun, build and log scene from xml file
+2026-05-15 01:41:04.185 | INFO     | spider.viewers:setup_viewer:106 - viewer is disabled, launch dummy viewer
+2026-05-15 01:41:25.143 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 18/4096
+2026-05-15 01:41:46.580 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 01:42:12.457 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 1/4096
+2026-05-15 01:42:25.382 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 1/4096
+2026-05-15 01:42:50.961 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 2/4096
+2026-05-15 01:43:20.224 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 22/4096
+2026-05-15 01:43:34.446 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 31/4096
+2026-05-15 01:43:48.928 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 27/4096
+2026-05-15 01:44:03.325 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 32/4096
+2026-05-15 01:44:17.753 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 18/4096
+2026-05-15 01:44:31.553 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 29/4096
+2026-05-15 01:44:44.438 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 30/4096
+2026-05-15 01:44:57.405 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 30/4096
+nefc overflow - please increase njmax to 608
+nefc overflow - please increase njmax to 605
+nefc overflow - please increase njmax to 626
+nefc overflow - please increase njmax to 563
+nefc overflow - please increase njmax to 522
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 508
+2026-05-15 01:45:14.962 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 41/4096
+nefc overflow - please increase njmax to 700
+nefc overflow - please increase njmax to 723
+nefc overflow - please increase njmax to 546
+nefc overflow - please increase njmax to 555
+nefc overflow - please increase njmax to 507
+2026-05-15 01:45:30.353 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 59/4096
+2026-05-15 01:45:45.469 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 68/4096
+2026-05-15 01:45:59.918 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 201/4096
+2026-05-15 01:46:14.047 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 155/4096
+nefc overflow - please increase njmax to 635
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 532
+nefc overflow - please increase njmax to 700
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 517
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 738
+nefc overflow - please increase njmax to 855
+nefc overflow - please increase njmax to 669
+nefc overflow - please increase njmax to 879
+nefc overflow - please increase njmax to 514
+nefc overflow - please increase njmax to 575
+nefc overflow - please increase njmax to 710
+nefc overflow - please increase njmax to 749
+nefc overflow - please increase njmax to 589
+2026-05-15 01:46:28.484 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 127/4096
+nefc overflow - please increase njmax to 513
+nefc overflow - please increase njmax to 501
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 574
+nefc overflow - please increase njmax to 619
+nefc overflow - please increase njmax to 622
+nefc overflow - please increase njmax to 607
+nefc overflow - please increase njmax to 691
+nefc overflow - please increase njmax to 652
+nefc overflow - please increase njmax to 718
+nefc overflow - please increase njmax to 634
+nefc overflow - please increase njmax to 550
+nefc overflow - please increase njmax to 576
+nefc overflow - please increase njmax to 786
+nefc overflow - please increase njmax to 693
+nefc overflow - please increase njmax to 657
+nefc overflow - please increase njmax to 870
+nefc overflow - please increase njmax to 882
+nefc overflow - please increase njmax to 846
+nefc overflow - please increase njmax to 747
+nefc overflow - please increase njmax to 597
+2026-05-15 01:46:42.677 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 185/4096
+nefc overflow - please increase njmax to 581
+nefc overflow - please increase njmax to 540
+nefc overflow - please increase njmax to 594
+nefc overflow - please increase njmax to 616
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 562
+nefc overflow - please increase njmax to 594
+nefc overflow - please increase njmax to 561
+nefc overflow - please increase njmax to 600
+nefc overflow - please increase njmax to 525
+nefc overflow - please increase njmax to 840
+nefc overflow - please increase njmax to 840
+nefc overflow - please increase njmax to 543
+2026-05-15 01:46:56.694 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 221/4096
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 516
+nefc overflow - please increase njmax to 588
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 522
+nefc overflow - please increase njmax to 604
+nefc overflow - please increase njmax to 577
+nefc overflow - please increase njmax to 634
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 577
+nefc overflow - please increase njmax to 546
+nefc overflow - please increase njmax to 582
+nefc overflow - please increase njmax to 549
+nefc overflow - please increase njmax to 513
+nefc overflow - please increase njmax to 580
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 526
+nefc overflow - please increase njmax to 594
+nefc overflow - please increase njmax to 528
+nefc overflow - please increase njmax to 622
+nefc overflow - please increase njmax to 583
+nefc overflow - please increase njmax to 619
+nefc overflow - please increase njmax to 577
+nefc overflow - please increase njmax to 607
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 534
+nefc overflow - please increase njmax to 577
+nefc overflow - please increase njmax to 589
+nefc overflow - please increase njmax to 886
+nefc overflow - please increase njmax to 553
+nefc overflow - please increase njmax to 558
+nefc overflow - please increase njmax to 540
+nefc overflow - please increase njmax to 762
+nefc overflow - please increase njmax to 651
+nefc overflow - please increase njmax to 624
+nefc overflow - please increase njmax to 528
+nefc overflow - please increase njmax to 830
+nefc overflow - please increase njmax to 566
+nefc overflow - please increase njmax to 566
+nefc overflow - please increase njmax to 579
+nefc overflow - please increase njmax to 586
+nefc overflow - please increase njmax to 604
+nefc overflow - please increase njmax to 673
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 850
+nefc overflow - please increase njmax to 694
+nefc overflow - please increase njmax to 607
+nefc overflow - please increase njmax to 563
+nefc overflow - please increase njmax to 659
+nefc overflow - please increase njmax to 845
+nefc overflow - please increase njmax to 587
+nefc overflow - please increase njmax to 566
+nefc overflow - please increase njmax to 611
+nefc overflow - please increase njmax to 521
+2026-05-15 01:47:15.584 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 225/4096
+2026-05-15 01:47:29.604 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 110/4096
+2026-05-15 01:47:42.658 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 97/4096
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 585
+nefc overflow - please increase njmax to 506
+nefc overflow - please increase njmax to 509
+nefc overflow - please increase njmax to 540
+nefc overflow - please increase njmax to 526
+nefc overflow - please increase njmax to 521
+nefc overflow - please increase njmax to 560
+nefc overflow - please increase njmax to 743
+nefc overflow - please increase njmax to 794
+nefc overflow - please increase njmax to 608
+nefc overflow - please increase njmax to 647
+nefc overflow - please increase njmax to 641
+nefc overflow - please increase njmax to 525
+nefc overflow - please increase njmax to 522
+nefc overflow - please increase njmax to 525
+nefc overflow - please increase njmax to 501
+nefc overflow - please increase njmax to 528
+nefc overflow - please increase njmax to 606
+nefc overflow - please increase njmax to 687
+nefc overflow - please increase njmax to 549
+nefc overflow - please increase njmax to 502
+nefc overflow - please increase njmax to 517
+nefc overflow - please increase njmax to 769
+nefc overflow - please increase njmax to 523
+nefc overflow - please increase njmax to 742
+nefc overflow - please increase njmax to 595
+nefc overflow - please increase njmax to 655
+nefc overflow - please increase njmax to 502
+nefc overflow - please increase njmax to 604
+nefc overflow - please increase njmax to 501
+nefc overflow - please increase njmax to 559
+nefc overflow - please increase njmax to 544
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 568
+nefc overflow - please increase njmax to 538
+nefc overflow - please increase njmax to 518
+nefc overflow - please increase njmax to 530
+nefc overflow - please increase njmax to 599
+nefc overflow - please increase njmax to 767
+nefc overflow - please increase njmax to 596
+nefc overflow - please increase njmax to 698
+nefc overflow - please increase njmax to 650
+nefc overflow - please increase njmax to 743
+nefc overflow - please increase njmax to 526
+nefc overflow - please increase njmax to 589
+2026-05-15 01:47:57.202 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 226/4096
+nefc overflow - please increase njmax to 510
+nefc overflow - please increase njmax to 518
+nefc overflow - please increase njmax to 503
+nefc overflow - please increase njmax to 545
+nefc overflow - please increase njmax to 569
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 537
+2026-05-15 01:48:10.731 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 172/4096
+nefc overflow - please increase njmax to 548
+2026-05-15 01:48:23.824 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 225/4096
+nefc overflow - please increase njmax to 514
+nefc overflow - please increase njmax to 539
+nefc overflow - please increase njmax to 695
+nefc overflow - please increase njmax to 773
+nefc overflow - please increase njmax to 800
+nefc overflow - please increase njmax to 725
+nefc overflow - please increase njmax to 599
+nefc overflow - please increase njmax to 584
+nefc overflow - please increase njmax to 563
+nefc overflow - please increase njmax to 599
+nefc overflow - please increase njmax to 593
+nefc overflow - please increase njmax to 569
+nefc overflow - please increase njmax to 521
+nefc overflow - please increase njmax to 656
+nefc overflow - please increase njmax to 734
+nefc overflow - please increase njmax to 554
+nefc overflow - please increase njmax to 551
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 590
+nefc overflow - please increase njmax to 569
+nefc overflow - please increase njmax to 554
+2026-05-15 01:48:37.090 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 172/4096
+nefc overflow - please increase njmax to 556
+nefc overflow - please increase njmax to 511
+nefc overflow - please increase njmax to 667
+nefc overflow - please increase njmax to 754
+nefc overflow - please increase njmax to 523
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 541
+nefc overflow - please increase njmax to 601
+nefc overflow - please increase njmax to 641
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 678
+nefc overflow - please increase njmax to 639
+nefc overflow - please increase njmax to 540
+nefc overflow - please increase njmax to 600
+nefc overflow - please increase njmax to 585
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 630
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 543
+nefc overflow - please increase njmax to 538
+nefc overflow - please increase njmax to 519
+nefc overflow - please increase njmax to 743
+nefc overflow - please increase njmax to 644
+nefc overflow - please increase njmax to 599
+nefc overflow - please increase njmax to 614
+nefc overflow - please increase njmax to 689
+nefc overflow - please increase njmax to 614
+nefc overflow - please increase njmax to 686
+nefc overflow - please increase njmax to 635
+nefc overflow - please increase njmax to 789
+nefc overflow - please increase njmax to 795
+nefc overflow - please increase njmax to 564
+2026-05-15 01:48:50.488 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 195/4096
+nefc overflow - please increase njmax to 553
+nefc overflow - please increase njmax to 650
+nefc overflow - please increase njmax to 710
+nefc overflow - please increase njmax to 575
+nefc overflow - please increase njmax to 813
+nefc overflow - please increase njmax to 530
+nefc overflow - please increase njmax to 536
+nefc overflow - please increase njmax to 674
+nefc overflow - please increase njmax to 506
+nefc overflow - please increase njmax to 613
+nefc overflow - please increase njmax to 655
+nefc overflow - please increase njmax to 510
+nefc overflow - please increase njmax to 510
+nefc overflow - please increase njmax to 537
+nefc overflow - please increase njmax to 669
+nefc overflow - please increase njmax to 732
+nefc overflow - please increase njmax to 501
+nefc overflow - please increase njmax to 748
+nefc overflow - please increase njmax to 601
+2026-05-15 01:49:07.746 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 305/4096
+nefc overflow - please increase njmax to 594
+nefc overflow - please increase njmax to 525
+nefc overflow - please increase njmax to 561
+nefc overflow - please increase njmax to 599
+nefc overflow - please increase njmax to 506
+nefc overflow - please increase njmax to 562
+nefc overflow - please increase njmax to 748
+nefc overflow - please increase njmax to 513
+nefc overflow - please increase njmax to 677
+nefc overflow - please increase njmax to 675
+nefc overflow - please increase njmax to 596
+nefc overflow - please increase njmax to 583
+nefc overflow - please increase njmax to 679
+nefc overflow - please increase njmax to 566
+nefc overflow - please increase njmax to 556
+nefc overflow - please increase njmax to 514
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 605
+nefc overflow - please increase njmax to 515
+nefc overflow - please increase njmax to 578
+nefc overflow - please increase njmax to 512
+nefc overflow - please increase njmax to 662
+nefc overflow - please increase njmax to 566
+nefc overflow - please increase njmax to 581
+nefc overflow - please increase njmax to 539
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 582
+2026-05-15 01:49:21.856 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 317/4096
+nefc overflow - please increase njmax to 540
+nefc overflow - please increase njmax to 612
+nefc overflow - please increase njmax to 586
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 550
+nefc overflow - please increase njmax to 542
+nefc overflow - please increase njmax to 581
+nefc overflow - please increase njmax to 657
+nefc overflow - please increase njmax to 1038
+nefc overflow - please increase njmax to 630
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 657
+nefc overflow - please increase njmax to 553
+nefc overflow - please increase njmax to 502
+nefc overflow - please increase njmax to 526
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 577
+nefc overflow - please increase njmax to 562
+nefc overflow - please increase njmax to 562
+nefc overflow - please increase njmax to 538
+nefc overflow - please increase njmax to 604
+nefc overflow - please increase njmax to 549
+nefc overflow - please increase njmax to 516
+nefc overflow - please increase njmax to 525
+nefc overflow - please increase njmax to 521
+nefc overflow - please increase njmax to 690
+nefc overflow - please increase njmax to 554
+nefc overflow - please increase njmax to 555
+nefc overflow - please increase njmax to 735
+nefc overflow - please increase njmax to 638
+nefc overflow - please increase njmax to 942
+nefc overflow - please increase njmax to 663
+nefc overflow - please increase njmax to 629
+nefc overflow - please increase njmax to 771
+nefc overflow - please increase njmax to 621
+nefc overflow - please increase njmax to 656
+nefc overflow - please increase njmax to 582
+nefc overflow - please increase njmax to 675
+nefc overflow - please increase njmax to 540
+nefc overflow - please increase njmax to 674
+nefc overflow - please increase njmax to 636
+nefc overflow - please increase njmax to 556
+nefc overflow - please increase njmax to 643
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 595
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 617
+nefc overflow - please increase njmax to 662
+nefc overflow - please increase njmax to 680
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 577
+nefc overflow - please increase njmax to 646
+nefc overflow - please increase njmax to 655
+nefc overflow - please increase njmax to 664
+nefc overflow - please increase njmax to 751
+nefc overflow - please increase njmax to 662
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 697
+nefc overflow - please increase njmax to 532
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 690
+nefc overflow - please increase njmax to 654
+nefc overflow - please increase njmax to 600
+nefc overflow - please increase njmax to 522
+nefc overflow - please increase njmax to 519
+nefc overflow - please increase njmax to 771
+nefc overflow - please increase njmax to 717
+nefc overflow - please increase njmax to 813
+nefc overflow - please increase njmax to 571
+nefc overflow - please increase njmax to 583
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 603
+nefc overflow - please increase njmax to 723
+2026-05-15 01:49:36.252 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 285/4096
+nefc overflow - please increase njmax to 592
+nefc overflow - please increase njmax to 563
+nefc overflow - please increase njmax to 554
+nefc overflow - please increase njmax to 551
+nefc overflow - please increase njmax to 569
+nefc overflow - please increase njmax to 752
+nefc overflow - please increase njmax to 851
+nefc overflow - please increase njmax to 923
+nefc overflow - please increase njmax to 722
+nefc overflow - please increase njmax to 806
+nefc overflow - please increase njmax to 851
+nefc overflow - please increase njmax to 726
+nefc overflow - please increase njmax to 555
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 649
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 563
+nefc overflow - please increase njmax to 542
+nefc overflow - please increase njmax to 552
+nefc overflow - please increase njmax to 576
+nefc overflow - please increase njmax to 552
+nefc overflow - please increase njmax to 613
+nefc overflow - please increase njmax to 799
+nefc overflow - please increase njmax to 640
+nefc overflow - please increase njmax to 514
+nefc overflow - please increase njmax to 532
+nefc overflow - please increase njmax to 512
+2026-05-15 01:49:50.006 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 432/4096
+nefc overflow - please increase njmax to 523
+nefc overflow - please increase njmax to 560
+nefc overflow - please increase njmax to 518
+nefc overflow - please increase njmax to 548
+nefc overflow - please increase njmax to 506
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 647
+nefc overflow - please increase njmax to 713
+nefc overflow - please increase njmax to 647
+nefc overflow - please increase njmax to 647
+nefc overflow - please increase njmax to 515
+nefc overflow - please increase njmax to 524
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 555
+nefc overflow - please increase njmax to 528
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 652
+nefc overflow - please increase njmax to 628
+nefc overflow - please increase njmax to 640
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 584
+nefc overflow - please increase njmax to 569
+nefc overflow - please increase njmax to 545
+nefc overflow - please increase njmax to 588
+nefc overflow - please increase njmax to 532
+nefc overflow - please increase njmax to 661
+nefc overflow - please increase njmax to 577
+nefc overflow - please increase njmax to 544
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 639
+nefc overflow - please increase njmax to 592
+nefc overflow - please increase njmax to 655
+2026-05-15 01:50:04.165 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 332/4096
+nefc overflow - please increase njmax to 659
+nefc overflow - please increase njmax to 689
+nefc overflow - please increase njmax to 563
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 570
+nefc overflow - please increase njmax to 720
+nefc overflow - please increase njmax to 728
+nefc overflow - please increase njmax to 602
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 509
+nefc overflow - please increase njmax to 511
+nefc overflow - please increase njmax to 781
+nefc overflow - please increase njmax to 547
+nefc overflow - please increase njmax to 586
+nefc overflow - please increase njmax to 559
+nefc overflow - please increase njmax to 515
+nefc overflow - please increase njmax to 557
+nefc overflow - please increase njmax to 630
+nefc overflow - please increase njmax to 699
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 523
+nefc overflow - please increase njmax to 514
+nefc overflow - please increase njmax to 721
+nefc overflow - please increase njmax to 616
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 574
+nefc overflow - please increase njmax to 538
+nefc overflow - please increase njmax to 548
+nefc overflow - please increase njmax to 645
+nefc overflow - please increase njmax to 510
+nefc overflow - please increase njmax to 588
+nefc overflow - please increase njmax to 613
+nefc overflow - please increase njmax to 511
+nefc overflow - please increase njmax to 513
+nefc overflow - please increase njmax to 537
+nefc overflow - please increase njmax to 562
+nefc overflow - please increase njmax to 679
+nefc overflow - please increase njmax to 514
+nefc overflow - please increase njmax to 601
+nefc overflow - please increase njmax to 589
+nefc overflow - please increase njmax to 541
+nefc overflow - please increase njmax to 728
+nefc overflow - please increase njmax to 620
+nefc overflow - please increase njmax to 923
+nefc overflow - please increase njmax to 509
+nefc overflow - please increase njmax to 698
+nefc overflow - please increase njmax to 644
+nefc overflow - please increase njmax to 818
+nefc overflow - please increase njmax to 554
+2026-05-15 01:50:18.155 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 261/4096
+2026-05-15 01:50:30.512 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 178/4096
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 523
+nefc overflow - please increase njmax to 517
+nefc overflow - please increase njmax to 519
+nefc overflow - please increase njmax to 634
+nefc overflow - please increase njmax to 760
+nefc overflow - please increase njmax to 688
+nefc overflow - please increase njmax to 704
+nefc overflow - please increase njmax to 608
+nefc overflow - please increase njmax to 510
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 568
+nefc overflow - please increase njmax to 560
+nefc overflow - please increase njmax to 521
+nefc overflow - please increase njmax to 535
+2026-05-15 01:50:43.492 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 183/4096
+2026-05-15 01:50:58.663 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 158/4096
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 650
+nefc overflow - please increase njmax to 657
+2026-05-15 01:51:10.139 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 183/4096
+nefc overflow - please increase njmax to 555
+nefc overflow - please increase njmax to 622
+nefc overflow - please increase njmax to 598
+nefc overflow - please increase njmax to 603
+nefc overflow - please increase njmax to 660
+nefc overflow - please increase njmax to 663
+nefc overflow - please increase njmax to 528
+nefc overflow - please increase njmax to 516
+nefc overflow - please increase njmax to 573
+nefc overflow - please increase njmax to 687
+nefc overflow - please increase njmax to 768
+nefc overflow - please increase njmax to 711
+nefc overflow - please increase njmax to 774
+nefc overflow - please increase njmax to 816
+nefc overflow - please increase njmax to 726
+nefc overflow - please increase njmax to 663
+nefc overflow - please increase njmax to 543
+nefc overflow - please increase njmax to 582
+nefc overflow - please increase njmax to 630
+nefc overflow - please increase njmax to 564
+nefc overflow - please increase njmax to 570
+nefc overflow - please increase njmax to 536
+nefc overflow - please increase njmax to 545
+nefc overflow - please increase njmax to 569
+nefc overflow - please increase njmax to 568
+nefc overflow - please increase njmax to 577
+nefc overflow - please increase njmax to 658
+nefc overflow - please increase njmax to 553
+nefc overflow - please increase njmax to 549
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 561
+nefc overflow - please increase njmax to 663
+nefc overflow - please increase njmax to 543
+nefc overflow - please increase njmax to 696
+nefc overflow - please increase njmax to 604
+2026-05-15 01:51:22.209 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 226/4096
+nefc overflow - please increase njmax to 518
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 526
+nefc overflow - please increase njmax to 628
+nefc overflow - please increase njmax to 767
+nefc overflow - please increase njmax to 656
+nefc overflow - please increase njmax to 608
+nefc overflow - please increase njmax to 563
+nefc overflow - please increase njmax to 534
+nefc overflow - please increase njmax to 519
+nefc overflow - please increase njmax to 516
+nefc overflow - please increase njmax to 705
+nefc overflow - please increase njmax to 814
+nefc overflow - please increase njmax to 721
+nefc overflow - please increase njmax to 502
+nefc overflow - please increase njmax to 514
+nefc overflow - please increase njmax to 662
+nefc overflow - please increase njmax to 515
+nefc overflow - please increase njmax to 539
+nefc overflow - please increase njmax to 518
+nefc overflow - please increase njmax to 776
+nefc overflow - please increase njmax to 572
+nefc overflow - please increase njmax to 547
+nefc overflow - please increase njmax to 523
+nefc overflow - please increase njmax to 528
+nefc overflow - please increase njmax to 510
+nefc overflow - please increase njmax to 567
+nefc overflow - please increase njmax to 576
+nefc overflow - please increase njmax to 681
+nefc overflow - please increase njmax to 768
+nefc overflow - please increase njmax to 720
+nefc overflow - please increase njmax to 633
+nefc overflow - please increase njmax to 675
+nefc overflow - please increase njmax to 585
+nefc overflow - please increase njmax to 648
+nefc overflow - please increase njmax to 554
+nefc overflow - please increase njmax to 503
+2026-05-15 01:51:34.151 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 273/4096
+nefc overflow - please increase njmax to 516
+nefc overflow - please increase njmax to 519
+nefc overflow - please increase njmax to 535
+nefc overflow - please increase njmax to 514
+nefc overflow - please increase njmax to 584
+nefc overflow - please increase njmax to 621
+nefc overflow - please increase njmax to 540
+nefc overflow - please increase njmax to 558
+nefc overflow - please increase njmax to 528
+nefc overflow - please increase njmax to 501
+nefc overflow - please increase njmax to 534
+nefc overflow - please increase njmax to 573
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 598
+nefc overflow - please increase njmax to 664
+nefc overflow - please increase njmax to 754
+nefc overflow - please increase njmax to 868
+nefc overflow - please increase njmax to 934
+nefc overflow - please increase njmax to 826
+nefc overflow - please increase njmax to 583
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 553
+nefc overflow - please increase njmax to 623
+nefc overflow - please increase njmax to 626
+nefc overflow - please increase njmax to 671
+nefc overflow - please increase njmax to 530
+nefc overflow - please increase njmax to 521
+nefc overflow - please increase njmax to 554
+nefc overflow - please increase njmax to 605
+nefc overflow - please increase njmax to 590
+nefc overflow - please increase njmax to 653
+nefc overflow - please increase njmax to 656
+nefc overflow - please increase njmax to 503
+nefc overflow - please increase njmax to 652
+nefc overflow - please increase njmax to 547
+nefc overflow - please increase njmax to 610
+nefc overflow - please increase njmax to 619
+nefc overflow - please increase njmax to 538
+nefc overflow - please increase njmax to 547
+nefc overflow - please increase njmax to 586
+nefc overflow - please increase njmax to 525
+nefc overflow - please increase njmax to 820
+nefc overflow - please increase njmax to 865
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 664
+nefc overflow - please increase njmax to 655
+nefc overflow - please increase njmax to 550
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 553
+nefc overflow - please increase njmax to 580
+nefc overflow - please increase njmax to 517
+nefc overflow - please increase njmax to 659
+nefc overflow - please increase njmax to 563
+nefc overflow - please increase njmax to 539
+nefc overflow - please increase njmax to 530
+nefc overflow - please increase njmax to 1007
+nefc overflow - please increase njmax to 545
+2026-05-15 01:51:46.784 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 228/4096
+nefc overflow - please increase njmax to 522
+nefc overflow - please increase njmax to 708
+nefc overflow - please increase njmax to 720
+nefc overflow - please increase njmax to 627
+nefc overflow - please increase njmax to 501
+nefc overflow - please increase njmax to 501
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 528
+nefc overflow - please increase njmax to 597
+nefc overflow - please increase njmax to 639
+nefc overflow - please increase njmax to 695
+nefc overflow - please increase njmax to 737
+nefc overflow - please increase njmax to 683
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 551
+nefc overflow - please increase njmax to 602
+nefc overflow - please increase njmax to 542
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 512
+nefc overflow - please increase njmax to 503
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 551
+nefc overflow - please increase njmax to 569
+nefc overflow - please increase njmax to 554
+2026-05-15 01:51:58.211 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 173/4096
+2026-05-15 01:52:08.743 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 122/4096
+nefc overflow - please increase njmax to 640
+nefc overflow - please increase njmax to 540
+nefc overflow - please increase njmax to 519
+nefc overflow - please increase njmax to 525
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 545
+nefc overflow - please increase njmax to 566
+nefc overflow - please increase njmax to 575
+nefc overflow - please increase njmax to 536
+nefc overflow - please increase njmax to 581
+nefc overflow - please increase njmax to 566
+nefc overflow - please increase njmax to 551
+nefc overflow - please increase njmax to 566
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 551
+nefc overflow - please increase njmax to 519
+nefc overflow - please increase njmax to 516
+nefc overflow - please increase njmax to 513
+nefc overflow - please increase njmax to 522
+nefc overflow - please increase njmax to 519
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 522
+nefc overflow - please increase njmax to 552
+nefc overflow - please increase njmax to 561
+nefc overflow - please increase njmax to 621
+nefc overflow - please increase njmax to 606
+nefc overflow - please increase njmax to 552
+nefc overflow - please increase njmax to 564
+nefc overflow - please increase njmax to 555
+nefc overflow - please increase njmax to 510
+2026-05-15 01:52:20.232 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 63/4096
+2026-05-15 01:52:34.644 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 147/4096
+nefc overflow - please increase njmax to 792
+nefc overflow - please increase njmax to 575
+nefc overflow - please increase njmax to 797
+nefc overflow - please increase njmax to 680
+nefc overflow - please increase njmax to 539
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 559
+nefc overflow - please increase njmax to 794
+nefc overflow - please increase njmax to 879
+nefc overflow - please increase njmax to 753
+nefc overflow - please increase njmax to 624
+nefc overflow - please increase njmax to 694
+nefc overflow - please increase njmax to 544
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 506
+nefc overflow - please increase njmax to 518
+nefc overflow - please increase njmax to 512
+nefc overflow - please increase njmax to 530
+2026-05-15 01:52:46.260 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 163/4096
+2026-05-15 01:52:57.324 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 124/4096
+2026-05-15 01:53:08.037 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 102/4096
+2026-05-15 01:53:18.819 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 115/4096
+2026-05-15 01:53:30.065 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 99/4096
+2026-05-15 01:53:40.884 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 100/4096
+2026-05-15 01:53:51.495 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 71/4096
+nefc overflow - please increase njmax to 523
+nefc overflow - please increase njmax to 615
+nefc overflow - please increase njmax to 693
+nefc overflow - please increase njmax to 540
+nefc overflow - please increase njmax to 620
+nefc overflow - please increase njmax to 575
+nefc overflow - please increase njmax to 502
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 659
+nefc overflow - please increase njmax to 659
+nefc overflow - please increase njmax to 695
+2026-05-15 01:54:07.376 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 294/4096
+nefc overflow - please increase njmax to 614
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 626
+nefc overflow - please increase njmax to 503
+nefc overflow - please increase njmax to 779
+nefc overflow - please increase njmax to 536
+nefc overflow - please increase njmax to 566
+nefc overflow - please increase njmax to 575
+nefc overflow - please increase njmax to 594
+2026-05-15 01:54:20.885 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 295/4096
+nefc overflow - please increase njmax to 539
+nefc overflow - please increase njmax to 572
+nefc overflow - please increase njmax to 522
+nefc overflow - please increase njmax to 575
+nefc overflow - please increase njmax to 686
+nefc overflow - please increase njmax to 697
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 511
+nefc overflow - please increase njmax to 518
+nefc overflow - please increase njmax to 545
+nefc overflow - please increase njmax to 539
+nefc overflow - please increase njmax to 584
+nefc overflow - please increase njmax to 545
+nefc overflow - please increase njmax to 677
+nefc overflow - please increase njmax to 518
+nefc overflow - please increase njmax to 561
+nefc overflow - please increase njmax to 561
+nefc overflow - please increase njmax to 825
+nefc overflow - please increase njmax to 765
+nefc overflow - please increase njmax to 984
+nefc overflow - please increase njmax to 786
+nefc overflow - please increase njmax to 615
+nefc overflow - please increase njmax to 616
+nefc overflow - please increase njmax to 721
+nefc overflow - please increase njmax to 628
+nefc overflow - please increase njmax to 691
+nefc overflow - please increase njmax to 778
+nefc overflow - please increase njmax to 556
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 532
+nefc overflow - please increase njmax to 679
+nefc overflow - please increase njmax to 509
+nefc overflow - please increase njmax to 549
+nefc overflow - please increase njmax to 537
+nefc overflow - please increase njmax to 563
+nefc overflow - please increase njmax to 509
+nefc overflow - please increase njmax to 530
+nefc overflow - please increase njmax to 782
+nefc overflow - please increase njmax to 554
+nefc overflow - please increase njmax to 605
+nefc overflow - please increase njmax to 560
+nefc overflow - please increase njmax to 534
+nefc overflow - please increase njmax to 552
+nefc overflow - please increase njmax to 621
+nefc overflow - please increase njmax to 831
+nefc overflow - please increase njmax to 750
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 567
+nefc overflow - please increase njmax to 501
+nefc overflow - please increase njmax to 522
+nefc overflow - please increase njmax to 516
+2026-05-15 01:54:35.286 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 239/4096
+2026-05-15 01:54:48.493 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 210/4096
+2026-05-15 01:55:01.346 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 194/4096
+2026-05-15 01:55:14.230 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 199/4096
+nefc overflow - please increase njmax to 583
+nefc overflow - please increase njmax to 652
+nefc overflow - please increase njmax to 517
+nefc overflow - please increase njmax to 546
+nefc overflow - please increase njmax to 696
+nefc overflow - please increase njmax to 750
+nefc overflow - please increase njmax to 738
+nefc overflow - please increase njmax to 711
+nefc overflow - please increase njmax to 897
+nefc overflow - please increase njmax to 597
+nefc overflow - please increase njmax to 648
+nefc overflow - please increase njmax to 648
+nefc overflow - please increase njmax to 516
+nefc overflow - please increase njmax to 553
+nefc overflow - please increase njmax to 580
+nefc overflow - please increase njmax to 574
+nefc overflow - please increase njmax to 610
+nefc overflow - please increase njmax to 748
+nefc overflow - please increase njmax to 850
+nefc overflow - please increase njmax to 818
+nefc overflow - please increase njmax to 848
+nefc overflow - please increase njmax to 692
+nefc overflow - please increase njmax to 625
+nefc overflow - please increase njmax to 643
+nefc overflow - please increase njmax to 760
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 562
+nefc overflow - please increase njmax to 634
+nefc overflow - please increase njmax to 535
+nefc overflow - please increase njmax to 517
+nefc overflow - please increase njmax to 524
+nefc overflow - please increase njmax to 524
+nefc overflow - please increase njmax to 518
+nefc overflow - please increase njmax to 590
+2026-05-15 01:55:27.492 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 152/4096
+2026-05-15 01:55:40.172 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 167/4096
+2026-05-15 01:55:56.435 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 206/4096
+nefc overflow - please increase njmax to 503
+nefc overflow - please increase njmax to 591
+nefc overflow - please increase njmax to 552
+nefc overflow - please increase njmax to 579
+nefc overflow - please increase njmax to 546
+nefc overflow - please increase njmax to 513
+nefc overflow - please increase njmax to 570
+nefc overflow - please increase njmax to 576
+nefc overflow - please increase njmax to 552
+nefc overflow - please increase njmax to 543
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 502
+nefc overflow - please increase njmax to 583
+nefc overflow - please increase njmax to 562
+nefc overflow - please increase njmax to 526
+nefc overflow - please increase njmax to 547
+nefc overflow - please increase njmax to 598
+nefc overflow - please increase njmax to 625
+nefc overflow - please increase njmax to 652
+nefc overflow - please increase njmax to 580
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 502
+nefc overflow - please increase njmax to 547
+nefc overflow - please increase njmax to 685
+nefc overflow - please increase njmax to 859
+nefc overflow - please increase njmax to 928
+nefc overflow - please increase njmax to 814
+nefc overflow - please increase njmax to 772
+nefc overflow - please increase njmax to 760
+nefc overflow - please increase njmax to 676
+nefc overflow - please increase njmax to 614
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 621
+nefc overflow - please increase njmax to 672
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 571
+nefc overflow - please increase njmax to 577
+nefc overflow - please increase njmax to 550
+nefc overflow - please increase njmax to 511
+nefc overflow - please increase njmax to 511
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 526
+nefc overflow - please increase njmax to 526
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 808
+nefc overflow - please increase njmax to 721
+nefc overflow - please increase njmax to 541
+nefc overflow - please increase njmax to 529
+nefc overflow - please increase njmax to 550
+nefc overflow - please increase njmax to 538
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 532
+nefc overflow - please increase njmax to 574
+nefc overflow - please increase njmax to 547
+2026-05-15 01:56:11.783 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 222/4096
+nefc overflow - please increase njmax to 507
+nefc overflow - please increase njmax to 624
+nefc overflow - please increase njmax to 678
+2026-05-15 01:56:25.485 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 247/4096
+nefc overflow - please increase njmax to 503
+nefc overflow - please increase njmax to 534
+nefc overflow - please increase njmax to 573
+nefc overflow - please increase njmax to 639
+nefc overflow - please increase njmax to 645
+nefc overflow - please increase njmax to 594
+nefc overflow - please increase njmax to 534
+nefc overflow - please increase njmax to 531
+nefc overflow - please increase njmax to 618
+nefc overflow - please increase njmax to 522
+nefc overflow - please increase njmax to 522
+2026-05-15 01:56:38.918 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 326/4096
+nefc overflow - please increase njmax to 553
+nefc overflow - please increase njmax to 1232
+nefc overflow - please increase njmax to 1001
+nefc overflow - please increase njmax to 1241
+nefc overflow - please increase njmax to 962
+2026-05-15 01:56:51.882 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 365/4096
+nefc overflow - please increase njmax to 672
+nefc overflow - please increase njmax to 605
+nefc overflow - please increase njmax to 512
+nefc overflow - please increase njmax to 702
+nefc overflow - please increase njmax to 607
+nefc overflow - please increase njmax to 527
+nefc overflow - please increase njmax to 550
+nefc overflow - please increase njmax to 571
+nefc overflow - please increase njmax to 631
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 598
+nefc overflow - please increase njmax to 601
+nefc overflow - please increase njmax to 508
+2026-05-15 01:57:04.783 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 299/4096
+nefc overflow - please increase njmax to 519
+nefc overflow - please increase njmax to 561
+nefc overflow - please increase njmax to 582
+nefc overflow - please increase njmax to 600
+nefc overflow - please increase njmax to 592
+nefc overflow - please increase njmax to 631
+nefc overflow - please increase njmax to 616
+nefc overflow - please increase njmax to 601
+nefc overflow - please increase njmax to 595
+nefc overflow - please increase njmax to 553
+nefc overflow - please increase njmax to 571
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 594
+nefc overflow - please increase njmax to 783
+nefc overflow - please increase njmax to 669
+nefc overflow - please increase njmax to 568
+nefc overflow - please increase njmax to 505
+nefc overflow - please increase njmax to 514
+nefc overflow - please increase njmax to 520
+nefc overflow - please increase njmax to 535
+nefc overflow - please increase njmax to 517
+nefc overflow - please increase njmax to 508
+nefc overflow - please increase njmax to 545
+nefc overflow - please increase njmax to 575
+nefc overflow - please increase njmax to 554
+nefc overflow - please increase njmax to 575
+nefc overflow - please increase njmax to 596
+nefc overflow - please increase njmax to 581
+nefc overflow - please increase njmax to 554
+nefc overflow - please increase njmax to 564
+nefc overflow - please increase njmax to 558
+nefc overflow - please increase njmax to 528
+2026-05-15 01:57:18.222 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 252/4096
+2026-05-15 01:57:30.657 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 199/4096
+2026-05-15 01:57:46.616 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 14/4096
+2026-05-15 01:57:59.351 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 11/4096
+2026-05-15 01:58:11.570 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 12/4096
+2026-05-15 01:58:23.259 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 12/4096
+2026-05-15 01:58:35.750 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 12/4096
+2026-05-15 01:58:48.115 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 12/4096
+2026-05-15 01:59:00.195 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 15/4096
+2026-05-15 01:59:12.363 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 16/4096
+2026-05-15 01:59:29.013 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 01:59:41.479 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 7/4096
+2026-05-15 01:59:53.357 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 02:00:04.803 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 02:00:16.258 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 02:00:28.384 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 02:00:40.376 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 02:00:52.339 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 8/4096
+2026-05-15 02:01:08.078 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 33/4096
+2026-05-15 02:01:20.419 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 25/4096
+2026-05-15 02:01:32.373 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 27/4096
+2026-05-15 02:01:44.230 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 34/4096
+2026-05-15 02:01:55.828 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 23/4096
+2026-05-15 02:02:07.138 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 23/4096
+2026-05-15 02:02:18.308 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 26/4096
+2026-05-15 02:02:29.522 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 27/4096
+2026-05-15 02:02:44.424 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 50/4096
+nefc overflow - please increase njmax to 506
+nefc overflow - please increase njmax to 528
+nefc overflow - please increase njmax to 546
+nefc overflow - please increase njmax to 558
+nefc overflow - please increase njmax to 513
+nefc overflow - please increase njmax to 504
+nefc overflow - please increase njmax to 552
+nefc overflow - please increase njmax to 549
+nefc overflow - please increase njmax to 501
+2026-05-15 02:02:56.570 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 50/4096
+2026-05-15 02:03:07.429 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 49/4096
+nefc overflow - please increase njmax to 535
+2026-05-15 02:03:18.189 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 48/4096
+2026-05-15 02:03:28.871 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 49/4096
+2026-05-15 02:03:39.657 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 50/4096
+2026-05-15 02:03:50.227 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 43/4096
+2026-05-15 02:04:00.708 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 40/4096
+2026-05-15 02:04:15.335 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 02:04:26.854 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 02:04:38.047 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 02:04:49.077 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 7/4096
+2026-05-15 02:04:59.954 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 7/4096
+2026-05-15 02:05:10.707 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 02:05:21.315 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 6/4096
+2026-05-15 02:05:31.772 | WARNING  | spider.optimizers.sampling:optimize_once:297 - NaNs or infs in rews: 7/4096
+2026-05-15 02:05:34.542 | INFO     | __main__:main:296 - Saved info to /share/culbertson/nl455/spider/example_datasets/processed/custom/leap/right/screwdriver/0/vel_obj_rot_rew_scale1.5_obj_rot_rew_scale0.6_num_samples4096_trajectory_mjwp.npz
+2026-05-15 02:05:35.563 | INFO     | __main__:main:306 - Saved video to /share/culbertson/nl455/spider/example_datasets/processed/custom/leap/right/screwdriver/0/vel_obj_rot_rew_scale1.5_obj_rot_rew_scale0.6_num_samples4096_trajectory_mjwp.mp4
+2026-05-15 02:05:36.815 | INFO     | __main__:save_reward_plot:112 - Saved reward plot to /share/culbertson/nl455/spider/example_datasets/processed/custom/leap/right/screwdriver/0/vel_obj_rot_rew_scale1.5_obj_rot_rew_scale0.6_num_samples4096_trajectory_mjwp_visualization_mjwp.png
+/share/culbertson/nl455/spider/example_datasets/processed/custom/leap/right/screwdriver/0/trajectory_kinematic.npz
+Loading data from /share/culbertson/nl455/spider/example_datasets/processed/custom/leap/right/screwdriver/0/trajectory_kinematic.npz
+Warp DeprecationWarning: The symbol `warp.context.runtime` will soon be removed from the public API. It can still be accessed from `warp._src.context.runtime` but might be changed or removed without notice.
+Module mujoco_warp._src.smooth 61a2af8 load on device 'cuda:0' took 4.42 ms  (cached)
+Module mujoco_warp._src.collision_driver de6dc98 load on device 'cuda:0' took 2.08 ms  (cached)
+Module _nxn_broadphase__locals__kernel_a346c471 a346c47 load on device 'cuda:0' took 2.42 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_19e6ee06 19e6ee0 load on device 'cuda:0' took 3.00 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_c58b55f9 c58b55f load on device 'cuda:0' took 3.41 ms  (cached)
+Module mujoco_warp._src.collision_primitive._create_narrowphase_kernel 6edaddc load on device 'cuda:0' took 0.63 ms  (cached)
+Module mujoco_warp._src.constraint 8bed7e5 load on device 'cuda:0' took 1.18 ms  (cached)
+Module mujoco_warp._src.sensor b9de671 load on device 'cuda:0' took 1.23 ms  (cached)
+Module _actuator_velocity__locals__actuator_velocity_f04c5480 db8dc9c load on device 'cuda:0' took 0.87 ms  (cached)
+Module mujoco_warp._src.passive eab35ec load on device 'cuda:0' took 1.00 ms  (cached)
+Module mujoco_warp._src.forward 3875c24 load on device 'cuda:0' took 1.61 ms  (cached)
+Module mujoco_warp._src.support b7a7a89 load on device 'cuda:0' took 0.72 ms  (cached)
+Module _tile_cholesky_factorize_solve__locals__cholesky_factorize_solve_75721b92 b743607 load on device 'cuda:0' took 19.33 ms  (cached)
+Module _tile_cholesky_factorize_solve__locals__cholesky_factorize_solve_c4e05987 fd0a184 load on device 'cuda:0' took 25.90 ms  (cached)
+Module mujoco_warp._src.solver f8d7d7e load on device 'cuda:0' took 2.78 ms  (cached)
+Module mul_m_dense__locals___mul_m_dense_803d80a2 fbc904a load on device 'cuda:0' took 51.03 ms  (cached)
+Module mul_m_dense__locals___mul_m_dense_fbd60039 8924a85 load on device 'cuda:0' took 49.22 ms  (cached)
+Module update_constraint_gauss_cost__locals__kernel_1f348527 1f34852 load on device 'cuda:0' took 1.37 ms  (cached)
+Module update_gradient_JTDAJ_dense_tiled__locals__kernel_8b1f0b81 b7319a9 load on device 'cuda:0' took 57.51 ms  (cached)
+Module update_gradient_cholesky__locals__kernel_d5b6cd93 df192df load on device 'cuda:0' took 33.76 ms  (cached)
+Module linesearch_jv_fused__locals__kernel_786137e4 786137e load on device 'cuda:0' took 1.59 ms  (cached)
+Module mujoco_warp._src.derivative 43453d8 load on device 'cuda:0' took 2.04 ms  (cached)
+starting loop
+[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(0.80787724), 'qpos_dist_min': np.float32(0.123997), 'qpos_dist_median': np.float32(0.36356777), 'qpos_dist_mean': np.float32(0.3736468), 'qvel_dist_max': np.float32(31.50112), 'qvel_dist_min': np.float32(3.2490065), 'qvel_dist_median': np.float32(4.622361), 'qvel_dist_mean': np.float32(4.7728167), 'qpos_rew_max': np.float32(-0.123997), 'qpos_rew_min': np.float32(-0.80787724), 'qpos_rew_median': np.float32(-0.36356777), 'qpos_rew_mean': np.float32(-0.3736468), 'qvel_rew_max': np.float32(0.0), 'qvel_rew_min': np.float32(0.0), 'qvel_rew_median': np.float32(0.0), 'qvel_rew_mean': np.float32(0.0), 'improvement': np.float32(0.15824437), 'rew_max': np.float32(-0.12399701), 'rew_min': np.float32(-0.8078769), 'rew_median': np.float32(-0.36356795), 'rew_mean': np.float32(-0.3736468), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(0.75555134), 'qpos_dist_min': np.float32(0.09866027), 'qpos_dist_median': np.float32(0.1669949), 'qpos_dist_mean': np.float32(0.19083354), 'qvel_dist_max': np.float32(10.238956), 'qvel_dist_min': np.float32(3.160648), 'qvel_dist_median': np.float32(3.7098584), 'qvel_dist_mean': np.float32(3.866324), 'qpos_rew_max': np.float32(-0.09866027), 'qpos_rew_min': np.float32(-0.75555134), 'qpos_rew_median': np.float32(-0.1669949), 'qpos_rew_mean': np.float32(-0.19083354), 'qvel_rew_max': np.float32(0.0), 'qvel_rew_min': np.float32(0.0), 'qvel_rew_median': np.float32(0.0), 'qvel_rew_mean': np.float32(0.0), 'improvement': np.float32(0.062143497), 'rew_max': np.float32(-0.09866028), 'rew_min': np.float32(-0.75555086), 'rew_median': np.float32(-0.16699493), 'rew_mean': np.float32(-0.19083354), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(0.7499648), 'qpos_dist_min': np.float32(0.09063005), 'qpos_dist_median': np.float32(0.18110263), 'qpos_dist_mean': np.float32(0.21534203), 'qvel_dist_max': np.float32(10.261083), 'qvel_dist_min': np.float32(3.1462896), 'qvel_dist_median': np.float32(3.864362), 'qvel_dist_mean': np.float32(4.027282), 'qpos_rew_max': np.float32(-0.09063005), 'qpos_rew_min': np.float32(-0.7499648), 'qpos_rew_median': np.float32(-0.18110263), 'qpos_rew_mean': np.float32(-0.21534203), 'qvel_rew_max': np.float32(0.0), 'qvel_rew_min': np.float32(0.0), 'qvel_rew_median': np.float32(0.0), 'qvel_rew_mean': np.float32(0.0), 'improvement': np.float32(0.091150194), 'rew_max': np.float32(-0.090629995), 'rew_min': np.float32(-0.749965), 'rew_median': np.float32(-0.18110266), 'rew_mean': np.float32(-0.21534203), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 121.1104s, sim_steps: 200/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 114.3576s, sim_steps: 400/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 119.6655s, sim_steps: 600/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 114.1264s, sim_steps: 800/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 113.6535s, sim_steps: 1000/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 95.7726s, sim_steps: 1200/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 90.7179s, sim_steps: 1400/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 109.2625s, sim_steps: 1600/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 110.0586s, sim_steps: 1800/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 101.9124s, sim_steps: 2000/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 100.2447s, sim_steps: 2200/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 97.5295s, sim_steps: 2400/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 90.5712s, sim_steps: 2600/2670, opt_steps: 8[optimize] iteration 0
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 1
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 2
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 3
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 4
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 5
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 6
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+[optimize] iteration 7
+info: {'qpos_dist_max': np.float32(nan), 'qpos_dist_min': np.float32(nan), 'qpos_dist_median': np.float32(nan), 'qpos_dist_mean': np.float32(nan), 'qvel_dist_max': np.float32(nan), 'qvel_dist_min': np.float32(nan), 'qvel_dist_median': np.float32(nan), 'qvel_dist_mean': np.float32(nan), 'qpos_rew_max': np.float32(nan), 'qpos_rew_min': np.float32(nan), 'qpos_rew_median': np.float32(nan), 'qpos_rew_mean': np.float32(nan), 'qvel_rew_max': np.float32(nan), 'qvel_rew_min': np.float32(nan), 'qvel_rew_median': np.float32(nan), 'qvel_rew_mean': np.float32(nan), 'improvement': np.float32(nan), 'rew_max': np.float32(nan), 'rew_min': np.float32(nan), 'rew_median': np.float32(nan), 'rew_mean': np.float32(nan), 'trace_sample': array([], shape=(6, 1000, 0, 3), dtype=float32)}
+Finished optimizing
+Realtime rate: 0.00, plan time: 91.0433s, sim_steps: 2800/2670, opt_steps: 8Total time: 1470.0266s

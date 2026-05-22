@@ -1,0 +1,53 @@
+jjs533-compute-03.cs.cornell.edu
+Tue May 19 00:57:18 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.124.06             Driver Version: 570.124.06     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA RTX PRO 6000 Blac...    On  |   00000000:01:00.0 Off |                  Off |
+| 30%   31C    P8             13W /  300W |       2MiB /  97887MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+Warp DeprecationWarning: The namespace `warp.context` will soon be removed from the public API. It can still be accessed from `warp._src.context` but might be changed or removed without notice.
+Warp DeprecationWarning: The symbol `warp.context.Module` will soon be removed from the public API. Use `warp.Module` instead.
+Warp DeprecationWarning: The symbol `warp.context.get_module` will soon be removed from the public API. Use `warp.get_module` instead.
+Warp DeprecationWarning: The namespace `warp.math` will soon be removed from the public API. It can still be accessed from `warp._src.math` but might be changed or removed without notice.
+Warp 1.11.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition" (95 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/nl455/.cache/warp/1.11.0
+2026-05-19 00:57:30.701 | WARNING  | spider.config:process_config:256 - task_info.json not found at /share/culbertson/nl455/spider/example_datasets/processed/arctic/wuji/right/scissors/0/../task_info.json, using default values
+2026-05-19 00:57:30.704 | WARNING  | spider.io:load_data:53 - ctrl data not found, using 'qpos' as a initial guess for control.
+Loading data from /share/culbertson/nl455/spider/example_datasets/processed/arctic/wuji/right/scissors/0/trajectory_kinematic.npz
+Loaded reference data from /share/culbertson/nl455/spider/example_datasets/processed/arctic/wuji/right/scissors/0/trajectory_kinematic.npz
+Warp DeprecationWarning: The symbol `warp.context.runtime` will soon be removed from the public API. It can still be accessed from `warp._src.context.runtime` but might be changed or removed without notice.
+Error executing job with overrides: ['num_samples=4096']
+Traceback (most recent call last):
+  File "/share/culbertson/nl455/spider/examples/run_mjwp.py", line 335, in run_main
+    main(config)
+  File "/share/culbertson/nl455/spider/examples/run_mjwp.py", line 133, in main
+    env = setup_env(config, ref_data)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/share/culbertson/nl455/spider/spider/simulators/mjwp.py", line 142, in setup_env
+    default_data_wp = mjwarp.put_data(
+                      ^^^^^^^^^^^^^^^^
+  File "/share/culbertson/nl455/miniconda3/envs/spider/lib/python3.12/site-packages/mujoco_warp/_src/io.py", line 1269, in put_data
+    mjd.ten_J_rownnz,
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'mujoco._structs.MjData' object has no attribute 'ten_J_rownnz'. Did you mean: 'efc_J_rownnz'?
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
