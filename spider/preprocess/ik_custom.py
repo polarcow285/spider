@@ -220,7 +220,7 @@ def main(
     max_num_initial_guess: int = 8,
     average_frame_size: int = 3,
     aggregate_contact: bool = True,
-    z_offset: float = 0.0,
+    z_offset: float = 0.6,
 ):
     # resolved processed directories
     dataset_dir = os.path.abspath(dataset_dir)
@@ -246,7 +246,7 @@ def main(
     # NOTE: sites in robot should follow the order of the xml file
     sites_in_robot = get_robot_sites(robot_type, embodiment_type)
 
-    file_path = f"{processed_dir_mano}/trajectory_keypoints.npz"
+    file_path = f"{processed_dir_mano}/trajectory_keypoints_{robot_type}.npz"
     loaded_data = np.load(file_path)
     qpos_finger_right = loaded_data["qpos_finger_right"][start_idx:end_idx]
     qpos_finger_left = loaded_data["qpos_finger_left"][start_idx:end_idx]

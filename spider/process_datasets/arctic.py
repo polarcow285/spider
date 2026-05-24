@@ -53,13 +53,14 @@ def main(
     dataset_dir: str = "../../example_datasets",
     embodiment_type: str = "bimanual",
     task: str = "pick_spoon_bowl",
+    robot_type: str = "leap",
     show_viewer: bool = True,
     save_video: bool = False,
     start_idx: int = 0,
 ):
     dataset_dir = os.path.abspath(dataset_dir)
     # file_path = f"{dataset_dir}/raw/custom/{task}_{embodiment_type}.h5"
-    file_path = f"{dataset_dir}/raw/arctic/demo.h5"
+    file_path = f"{dataset_dir}/raw/arctic/demo_{robot_type}.h5"
     output_dir = get_processed_data_dir(
         dataset_dir=dataset_dir,
         dataset_name="arctic",
@@ -76,7 +77,8 @@ def main(
         # Standard MANO order: [Wrist, Thumb(1-4), Index(5-8), Middle(9-12), Ring(13-16), Pinky(17-20)]
         qpos = f["qpos"][:]   # (T, 30)
         mano_keypoints = f["mano_joint_coord"][:]  # (T, 21, 3)
-    wrist_pos = qpos[:, 8:11]  # (T, 3)
+    # wrist_pos = qpos[:, 8:11]  # (T, 3)
+    wrist_pos = mano_keypoints[:, 0, :]  # (T, 3) use wrist keypoint as wrist position
     # scipy converts to xyzw by default
     wrist_quat = R.from_euler('XYZ', qpos[:, 11:14]).as_quat()  # (T, 4)
     wrist_quat = wrist_quat[:, [3, 0, 1, 2]]  # convert to wxyz
@@ -107,7 +109,7 @@ def main(
     qpos_obj_right = np.concatenate([obj_pos, obj_quat], axis=1).astype(np.float32)  # (T, 7)
 
     np.savez(
-        f"{output_dir}/trajectory_keypoints.npz",
+        f"{output_dir}/trajectory_keypoints_{robot_type}.npz",
         qpos_wrist_right=qpos_wrist_right[start_idx:],
         qpos_finger_right=qpos_finger_right[start_idx:],
         qpos_obj_right=qpos_obj_right[start_idx:],
@@ -116,7 +118,7 @@ def main(
         qpos_obj_left=qpos_obj_left[start_idx:],
         obj_arti=obj_arti[start_idx:],
     )
-    loguru.logger.info(f"Saved qpos to {output_dir}/trajectory_keypoints.npz")
+    loguru.logger.info(f"Saved qpos to {output_dir}/trajectory_keypoints_{robot_type}.npz")
 
     qpos_list = np.concatenate(
         [
@@ -165,16 +167,21 @@ def main(
             "bottom.obj",
         )
 
+        if robot_type == "wuji":
+            mesh_scale = [0.001, 0.001, 0.001]
+        else:
+            mesh_scale = [0.002, 0.002, 0.002]
+
         mj_spec.add_mesh(
             name="scissors_top",
             file=top_mesh_path,
-            scale=[0.001, 0.001, 0.001],
+            scale=mesh_scale,
         )
 
         mj_spec.add_mesh(
             name="scissors_bottom",
             file=bottom_mesh_path,
-            scale=[0.001, 0.001, 0.001],
+            scale=mesh_scale,
         )
 
         scissors_root = object_right_handle.add_body(

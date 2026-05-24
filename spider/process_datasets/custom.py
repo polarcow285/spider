@@ -16,8 +16,11 @@ Keys: ['qpos_wrist_right', 'qpos_finger_right', 'qpos_wrist_left', 'qpos_finger_
     qpos_finger_right: shape=(T, 5, 7), dtype=float32 (5 fingertips)
     qpos_obj_right: shape=(T, 7), dtype=float32
 
+Example usage:
+    python spider/process_datasets/custom.py --task screwdriver --embodiment-type right --target-robot-type wuji --dataset-dir example_datasets
+    python spider/process_datasets/custom.py --task screwdriver --embodiment-type right --target-robot-type leap --dataset-dir example_datasets
+
 """
-import io
 import json
 import os
 from contextlib import contextmanager
@@ -36,13 +39,14 @@ def main(
     dataset_dir: str = "../../example_datasets",
     embodiment_type: str = "bimanual",
     task: str = "pick_spoon_bowl",
+    robot_type: str = "leap",
     show_viewer: bool = True,
     save_video: bool = False,
     start_idx: int = 0,
 ):
     dataset_dir = os.path.abspath(dataset_dir)
     # file_path = f"{dataset_dir}/raw/custom/{task}_{embodiment_type}.h5"
-    file_path = f"{dataset_dir}/raw/arctic/demo_human_scale.h5"
+    file_path = f"{dataset_dir}/raw/custom/demo_{robot_type}.h5"
     output_dir = get_processed_data_dir(
         dataset_dir=dataset_dir,
         dataset_name="custom",
@@ -104,7 +108,7 @@ def main(
     qpos_obj_right = np.concatenate([obj_pos, obj_quat], axis=1).astype(np.float32)  # (T, 7)
 
     np.savez(
-        f"{output_dir}/trajectory_keypoints.npz",
+        f"{output_dir}/trajectory_keypoints_{robot_type}.npz",
         qpos_wrist_right=qpos_wrist_right[start_idx:],
         qpos_finger_right=qpos_finger_right[start_idx:],
         qpos_obj_right=qpos_obj_right[start_idx:],
@@ -112,7 +116,7 @@ def main(
         qpos_finger_left=qpos_finger_left[start_idx:],
         qpos_obj_left=qpos_obj_left[start_idx:],
     )
-    loguru.logger.info(f"Saved qpos to {output_dir}/trajectory_keypoints.npz")
+    loguru.logger.info(f"Saved qpos to {output_dir}/trajectory_keypoints_{robot_type}.npz")
 
     task_info_path = f"{output_dir}/../task_info.json"
     with open(task_info_path, "w") as f:

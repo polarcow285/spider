@@ -115,7 +115,7 @@ def main(
         "ring_tip",
         "pinky_tip",
     ]
-    if robot_type in ["allegro", "metahand"]:
+    if robot_type in ["allegro", "metahand", "leap"]:
         finger_names = finger_names[:4]
 
     # add assets

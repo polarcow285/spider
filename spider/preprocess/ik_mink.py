@@ -38,6 +38,89 @@ from spider.io import get_processed_data_dir
 from spider.mujoco_utils import get_viewer
 
 
+LEAP_NO_BACKBEND_JOINTS = {
+    "if_mcp",
+    "if_pip",
+    "if_dip",
+    "mf_mcp",
+    "mf_pip",
+    "mf_dip",
+    "rf_mcp",
+    "rf_pip",
+    "rf_dip",
+    "th_mcp",
+    "th_ipl",
+}
+
+
+def is_no_backbend_flexion_joint(robot_type: str, joint_name: str | None) -> bool:
+    if joint_name is None:
+        return False
+
+    if robot_type == "leap":
+        return joint_name in LEAP_NO_BACKBEND_JOINTS
+
+    if robot_type == "wuji":
+        if "_finger" not in joint_name or "_joint" not in joint_name:
+            return False
+        joint_number = joint_name.rsplit("_joint", maxsplit=1)[-1]
+        return joint_number in {"1", "3", "4"}
+
+    return False
+
+
+def tighten_no_backbend_joint_limits(
+    model: mujoco.MjModel,
+    robot_type: str,
+    min_flexion: float,
+) -> list[str]:
+    """Remove negative flexion from finger joints that can hyperextend."""
+    tightened = []
+    for jid in range(model.njnt):
+        joint_type = model.jnt_type[jid]
+        if joint_type != mujoco.mjtJoint.mjJNT_HINGE:
+            continue
+
+        joint_name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_JOINT, jid)
+        if not is_no_backbend_flexion_joint(robot_type, joint_name):
+            continue
+
+        lower, upper = model.jnt_range[jid]
+        if lower >= min_flexion or upper <= min_flexion:
+            continue
+
+        model.jnt_limited[jid] = 1
+        model.jnt_range[jid, 0] = min_flexion
+        tightened.append(joint_name)
+
+    return tightened
+
+
+def clamp_no_backbend_joint_positions(
+    model: mujoco.MjModel,
+    qpos: np.ndarray,
+    robot_type: str,
+    min_flexion: float,
+) -> bool:
+    changed = False
+    for jid in range(model.njnt):
+        joint_type = model.jnt_type[jid]
+        if joint_type != mujoco.mjtJoint.mjJNT_HINGE:
+            continue
+
+        joint_name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_JOINT, jid)
+        if not is_no_backbend_flexion_joint(robot_type, joint_name):
+            continue
+
+        qpos_addr = model.jnt_qposadr[jid]
+        lower = max(model.jnt_range[jid, 0], min_flexion)
+        if qpos[qpos_addr] < lower:
+            qpos[qpos_addr] = lower
+            changed = True
+
+    return changed
+
+
 def add_mocap_bodies(
     mjspec: MjSpec,
     sites_for_mimic: list[str],
@@ -219,21 +302,33 @@ def make_mink_tasks(
     sites_for_mimic: list[str],
     model: mujoco.MjModel,
     posture_cost: float,
+    wrist_position_cost: float,
+    wrist_orientation_cost: float,
+    object_position_cost: float,
+    object_orientation_cost: float,
+    finger_position_cost: float,
 ):
     tasks = {}
     for site_name in sites_for_mimic:
-        if "wrist" in site_name or "object" in site_name:
+        if "wrist" in site_name:
             tasks[site_name] = FrameTask(
                 frame_name=site_name,
                 frame_type="site",
-                position_cost=50.0,
-                orientation_cost=10.0,
+                position_cost=wrist_position_cost,
+                orientation_cost=wrist_orientation_cost,
+            )
+        elif "object" in site_name:
+            tasks[site_name] = FrameTask(
+                frame_name=site_name,
+                frame_type="site",
+                position_cost=object_position_cost,
+                orientation_cost=object_orientation_cost,
             )
         else:
             tasks[site_name] = FrameTask(
                 frame_name=site_name,
                 frame_type="site",
-                position_cost=20.0,
+                position_cost=finger_position_cost,
                 orientation_cost=0.0,
             )
     posture_task = PostureTask(model, cost=posture_cost)
@@ -317,6 +412,8 @@ def main(
     sim_dt: float = 0.002, # 0.01,
     ref_dt: float = 0.02,
     data_id: int = 0,
+    keypoint_path: str | None = None,
+    keypoint_variant: str | None = None,
     open_hand: bool = False,
     contact_detection_step_threshold: int = 3,
     finger_solimp_width: float = 0.01,
@@ -328,8 +425,15 @@ def main(
     aggregate_contact: bool = True,
     z_offset: float = 0.0,
     posture_cost: float = 1.0,
+    wrist_position_cost: float = 50.0,
+    wrist_orientation_cost: float = 10.0,
+    object_position_cost: float = 50.0,
+    object_orientation_cost: float = 10.0,
+    finger_position_cost: float = 20.0,
     max_joint_velocity: float = 8.0,
     ik_substeps_per_frame: int = 20,
+    prevent_backward_finger_bending: bool = True,
+    no_backbend_min_flexion: float = 0.0,
     visualization_fps: int = 120,
     articulated: bool = False,
     articulated_joint_name: str = "scissors_joint",
@@ -359,26 +463,27 @@ def main(
     # NOTE: sites in robot should follow the order of the xml file
     sites_in_robot = get_robot_sites(robot_type, embodiment_type)
 
-    file_path = f"{processed_dir_mano}/trajectory_keypoints.npz"
+    file_path = f"{processed_dir_mano}/trajectory_keypoints_{robot_type}.npz"
     loaded_data = np.load(file_path)
-    qpos_finger_right = loaded_data["qpos_finger_right"][start_idx:end_idx]
-    qpos_finger_left = loaded_data["qpos_finger_left"][start_idx:end_idx]
-    qpos_wrist_right = loaded_data["qpos_wrist_right"][start_idx:end_idx]
-    qpos_wrist_left = loaded_data["qpos_wrist_left"][start_idx:end_idx]
-    qpos_obj_right = loaded_data["qpos_obj_right"][start_idx:end_idx]
-    qpos_obj_left = loaded_data["qpos_obj_left"][start_idx:end_idx]
+    frame_slice = slice(start_idx, None if end_idx < 0 else end_idx)
+    qpos_finger_right = loaded_data["qpos_finger_right"][frame_slice]
+    qpos_finger_left = loaded_data["qpos_finger_left"][frame_slice]
+    qpos_wrist_right = loaded_data["qpos_wrist_right"][frame_slice]
+    qpos_wrist_left = loaded_data["qpos_wrist_left"][frame_slice]
+    qpos_obj_right = loaded_data["qpos_obj_right"][frame_slice]
+    qpos_obj_left = loaded_data["qpos_obj_left"][frame_slice]
     obj_arti = None
     if articulated:
         if "obj_arti" not in loaded_data:
             raise ValueError(
-                "articulated=True requires `obj_arti` in trajectory_keypoints.npz"
+                f"articulated=True requires `obj_arti` in {file_path}"
             )
-        obj_arti = loaded_data["obj_arti"][start_idx:end_idx]
+        obj_arti = loaded_data["obj_arti"][frame_slice]
         if obj_arti.ndim == 1:
             obj_arti = obj_arti[:, None]
     try:
-        contact_left = loaded_data["contact_left"][start_idx:end_idx]
-        contact_right = loaded_data["contact_right"][start_idx:end_idx]
+        contact_left = loaded_data["contact_left"][frame_slice]
+        contact_right = loaded_data["contact_right"][frame_slice]
     except:
         loguru.logger.warning("No contact data found, using all one")
         contact_left = np.ones((qpos_finger_right.shape[0], 5))
@@ -417,6 +522,18 @@ def main(
     # load model
     mj_model = mujoco.MjModel.from_xml_path(model_path)
     mj_model.opt.timestep = sim_dt
+    no_backbend_joint_names = []
+    if prevent_backward_finger_bending:
+        no_backbend_joint_names = tighten_no_backbend_joint_limits(
+            mj_model,
+            robot_type,
+            no_backbend_min_flexion,
+        )
+        if no_backbend_joint_names:
+            loguru.logger.info(
+                "Preventing backward finger bending by setting lower limits to "
+                f"{no_backbend_min_flexion} for: {no_backbend_joint_names}"
+            )
     mj_data = mujoco.MjData(mj_model)
     print_mj_qpos_layout(mj_model)
 
@@ -575,6 +692,12 @@ def main(
 
     mj_model_ik = mj_spec.compile()
     mj_model_ik.opt.timestep = sim_dt
+    if prevent_backward_finger_bending:
+        tighten_no_backbend_joint_limits(
+            mj_model_ik,
+            robot_type,
+            no_backbend_min_flexion,
+        )
     mj_model_ik.opt.iterations = 20
     mj_model_ik.opt.ls_iterations = 50
     if not enable_collision:
@@ -586,6 +709,20 @@ def main(
         sites_for_mimic,
         mj_model_ik,
         posture_cost=posture_cost,
+        wrist_position_cost=wrist_position_cost,
+        wrist_orientation_cost=wrist_orientation_cost,
+        object_position_cost=object_position_cost,
+        object_orientation_cost=object_orientation_cost,
+        finger_position_cost=finger_position_cost,
+    )
+    loguru.logger.info(
+        "Mink task costs: "
+        f"wrist_pos={wrist_position_cost}, "
+        f"wrist_ori={wrist_orientation_cost}, "
+        f"finger_pos={finger_position_cost}, "
+        f"object_pos={object_position_cost}, "
+        f"object_ori={object_orientation_cost}, "
+        f"posture={posture_cost}"
     )
     articulated_qadr = None
     if articulated:
@@ -709,6 +846,16 @@ def main(
                             articulated_qadr : articulated_qadr + obj_arti.shape[1]
                         ] = obj_arti[cnt]
                         configuration.update(mj_data_ik.qpos)
+                    if (
+                        prevent_backward_finger_bending
+                        and clamp_no_backbend_joint_positions(
+                            mj_model_ik,
+                            mj_data_ik.qpos,
+                            robot_type,
+                            no_backbend_min_flexion,
+                        )
+                    ):
+                        configuration.update(mj_data_ik.qpos)
                     mj_data_ik.qvel[:] = vel
                 mj_data_ik.qvel[:] = 0.0
                 qpos_list = []
@@ -742,6 +889,16 @@ def main(
                     mj_data_ik.qpos[
                         articulated_qadr : articulated_qadr + obj_arti.shape[1]
                     ] = obj_arti[cnt]
+                    configuration.update(mj_data_ik.qpos)
+                if (
+                    prevent_backward_finger_bending
+                    and clamp_no_backbend_joint_positions(
+                        mj_model_ik,
+                        mj_data_ik.qpos,
+                        robot_type,
+                        no_backbend_min_flexion,
+                    )
+                ):
                     configuration.update(mj_data_ik.qpos)
                 mj_data_ik.qvel[:] = vel
             mujoco.mj_forward(mj_model_ik, mj_data_ik)
@@ -901,7 +1058,7 @@ def main(
                 print("\n========== FULL qpos decoding ==========\n")
                 mapping = decode_qpos(mj_model)
                 for idx, label in mapping:
-                    print(f"qpos[{idx:02d}] → {label}")
+                    print(f"qpos[{idx:02d}] -> {label}")
                 if show_viewer:
                     # check if the rollout is good, if so, break
                     user_input = input("Is the rollout good? (y/n): ")
@@ -926,83 +1083,56 @@ def main(
 
         qpos_list = np.array(qpos_list)
 
-        # average filter
-        def moving_average_filter(signal_data, window_size=5):
-            return np.convolve(
-                signal_data, np.ones(window_size) / window_size, mode="valid"
-            )
+                # ============================================================
+        # Save EXACT trajectory that was visualized in MuJoCo viewer
+        # ============================================================
 
-        # Apply moving average filter
-        filtered_qpos_list = np.zeros(
-            (qpos_list.shape[0] - average_frame_size + 1, qpos_list.shape[1])
-        )
-        for i in range(qpos_list.shape[1]):
-            filtered_qpos_list[:, i] = moving_average_filter(
-                qpos_list[:, i], average_frame_size
-            )
-        qpos_list = filtered_qpos_list
-
-        def low_pass_filter(signal_data, cutoff_frequency=10, order=4):
-            nyquist = 0.5 * (1 / ref_dt)
-            normal_cutoff = cutoff_frequency / nyquist
-            b, a = signal.butter(order, normal_cutoff, btype="low", analog=False)
-            return signal.filtfilt(b, a, signal_data)
-
-        # Apply low pass filter
-        # for i in range(qpos_list.shape[1]):
-        #     qpos_list[:, i] = low_pass_filter(qpos_list[:, i])
+        qpos_list = np.array(qpos_list)
+        contact_pos_list = np.array(contact_pos_list)
+        contact_list = np.array(contact_list)
 
         H = qpos_list.shape[0]
-        # get qvel
-        qvel_list = np.zeros((H - 1, mj_model_ik.nv))
+
+        # Compute qvel directly from the visualized trajectory. Keep frame 0 so
+        # output length matches the input trajectory length.
+        qvel_list = np.zeros((H, mj_model_ik.nv))
+
         for i in range(1, H):
             mujoco.mj_differentiatePos(
                 mj_model_ik,
-                qvel_list[i - 1, :],
+                qvel_list[i],
                 ref_dt,
-                qpos_list[i - 1, :],
-                qpos_list[i, :],
+                qpos_list[i - 1],
+                qpos_list[i],
             )
-        qpos_list = qpos_list[1:]
-        contact_pos_list = np.array(contact_pos_list)[1:]
-        contact_list = np.array(contact_list)[1:]
-        assert qpos_list.shape[0] == qvel_list.shape[0]
 
-        # directly rollout ctrl to get qpos_rollout
-        mj_model.opt.timestep = ref_dt
-        mj_data.qpos[:] = qpos_list[0]
-        mj_data.qvel[:] = qvel_list[0]
-        mj_data.ctrl[:] = qpos_list[0][:-nq_obj]
-        mujoco.mj_step(mj_model, mj_data)
-        H = qpos_list.shape[0]
-        qpos_rollout = np.zeros((H, mj_model.nq))
-        qvel_rollout = np.zeros((H, mj_model.nv))
-        qpos_rollout[0] = qpos_list[0]
-        for i in range(1, H):
-            mj_data.ctrl[:] = qpos_list[i][:-nq_obj]
-            noise = np.random.randn(mj_model.nu) * 0.2
-            noise[:6] *= 0.0
-            noise[22:28] *= 0.0
-            mj_data.ctrl[:] += noise
-            mujoco.mj_step(mj_model, mj_data)
-            qpos_rollout[i] = mj_data.qpos.copy()
+        qpos_save = qpos_list
+        contact_pos_save = contact_pos_list
+        contact_save = contact_list
 
-        out_npz = f"{file_dir}/trajectory_kinematic.npz"
+        assert qpos_save.shape[0] == qvel_list.shape[0]
+
+        out_npz = f"{file_dir}/trajectory_kinematic_mink.npz"
+
         np.savez(
             out_npz,
-            qpos=qpos_list,
-            qpos_rollout=qpos_rollout,
+            qpos=qpos_save,
             qvel=qvel_list,
-            contact=contact_list,
-            contact_pos=contact_pos_list,
+            contact=contact_save,
+            contact_pos=contact_pos_save,
             frequency=1 / ref_dt,
         )
-        out_npz = f"{file_dir}/trajectory_ikrollout.npz"
+
+        # Save identical rollout copy for compatibility
+        out_npz_rollout = f"{file_dir}/trajectory_ikrollout_mink.npz"
+
         np.savez(
-            out_npz,
-            qpos=qpos_rollout,
+            out_npz_rollout,
+            qpos=qpos_save,
         )
+
         loguru.logger.info(f"Saved {out_npz}")
+        loguru.logger.info(f"Saved {out_npz_rollout}")
 
 
 if __name__ == "__main__":
