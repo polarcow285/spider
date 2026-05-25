@@ -16,7 +16,7 @@
     </default>
     <default class="wrist_vertical_translation">
       <joint limited="true" range="0 1" />
-      <position kp="1000" kv="100" ctrlrange="0.5 1.5" />
+      <position kp="1000" kv="100" ctrlrange="0 1" />
     </default>
     <default class="wrist_rotation">
       <joint limited="true" range="-3.14 3.14" />

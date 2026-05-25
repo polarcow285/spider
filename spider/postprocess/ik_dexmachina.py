@@ -10,11 +10,9 @@ The qpos layout is expected to match ik_mink/isaac.py:
 This script runs a DexMachina-style collision-aware retargeting pass: robot qpos
 values are used as absolute position-actuator targets, the object state is
 pinned to the IK/demo state, contacts are enabled, and every frame can be solved
-independently. Like DexMachina, the H5 keeps the smooth controller targets
-separate from the physics-achieved qpos used for contact extraction. The default
-saved replay keys use a sequential smooth MuJoCo rollout for stable
-visualization/replay, while the strict collision-repaired achieved qpos is also
-stored for diagnostics and contact-aware rewards.
+independently. Like DexMachina, the default saved replay keys come from a second
+single-environment controlled rollout, while the strict collision-repaired
+achieved qpos is also stored for diagnostics and contact-aware rewards.
 
 Output format: h5 file ``dexmachina_retargeted_{robot_type}_{task}.h5`` saved
 by default in ``spider/postprocess/mink/`` and compatible with
@@ -35,7 +33,8 @@ Additional DexMachina-style contact keys:
     contact_links: shape=(T, num_object_parts, num_hand_links, 4), float64
         xyz plus DexMachina-style part id (1=top, 2=bottom when available)
     achieved_qpos: shape=(T, nq), float64, collision-aware achieved state
-    target_qpos: shape=(T, nq), float64, smooth absolute controller targets
+    target_qpos: shape=(T, nq), float64, absolute controller targets
+    rollout_qpos: shape=(T, nq), float64, stage-2 controlled rollout state
 
 Example:
     python spider/postprocess/ik_dexmachina.py --task scissors --embodiment-type right --dataset-dir example_datasets --dataset-name arctic --robot-type leap
@@ -184,6 +183,35 @@ def infer_object_qpos_start(
     if valid_addr.size == 0:
         raise ValueError("Could not infer robot qpos span because no joint actuators were found.")
     return int(valid_addr.max()) + 1
+
+
+def apply_wrist_stiffness_scale(
+    model: mujoco.MjModel,
+    actuator_qpos_addr: np.ndarray,
+    object_qpos_start: int,
+    wrist_stiffness_scale: float,
+) -> np.ndarray:
+    """Scale MuJoCo position-servo gains for the wrist/root qpos block."""
+    scale = float(wrist_stiffness_scale)
+    if scale <= 0.0:
+        raise ValueError("wrist_stiffness_scale must be positive.")
+    if np.isclose(scale, 1.0):
+        return np.array([], dtype=np.int64)
+
+    wrist_qpos_end = min(6, object_qpos_start)
+    if wrist_qpos_end <= 0:
+        return np.array([], dtype=np.int64)
+
+    actuator_ids = np.flatnonzero(
+        (actuator_qpos_addr >= 0) & (actuator_qpos_addr < wrist_qpos_end)
+    )
+    servo_gain_scale = min(scale, 4.0)
+    for actuator_id in actuator_ids:
+        actuator_id = int(actuator_id)
+        model.actuator_gainprm[actuator_id, 0] *= servo_gain_scale
+        model.actuator_biasprm[actuator_id, 1] *= servo_gain_scale
+        model.actuator_biasprm[actuator_id, 2] *= servo_gain_scale
+    return actuator_ids.astype(np.int64)
 
 
 def build_frozen_joint_slices(
@@ -496,6 +524,7 @@ def build_context(
     clear_contact_exclusions: bool,
     collide_parent_child: bool,
     collision_margin: float,
+    wrist_stiffness_scale: float,
 ) -> RetargetContext:
     model = load_model_for_retargeting(
         model_path=model_path,
@@ -516,6 +545,18 @@ def build_context(
         actuator_qpos_addr=actuator_qpos_addr,
         object_qpos_start=object_qpos_start,
     )
+    wrist_actuator_ids = apply_wrist_stiffness_scale(
+        model=model,
+        actuator_qpos_addr=actuator_qpos_addr,
+        object_qpos_start=inferred_object_qpos_start,
+        wrist_stiffness_scale=wrist_stiffness_scale,
+    )
+    if wrist_actuator_ids.size > 0:
+        loguru.logger.info(
+            "Enabled wrist/root tracking scale "
+            f"{wrist_stiffness_scale:g} for {wrist_actuator_ids.size} actuators "
+            f"(servo gains capped at {min(float(wrist_stiffness_scale), 4.0):g}x)."
+        )
     frozen_joint_slices = build_frozen_joint_slices(
         model,
         object_qpos_start=inferred_object_qpos_start,
@@ -551,6 +592,39 @@ def set_position_targets(
         context.actuator_ctrlrange[limited, 1],
     )
     data.ctrl[:] = ctrl
+
+
+def wrist_tracking_alpha(wrist_stiffness_scale: float) -> float:
+    if wrist_stiffness_scale <= 1.0:
+        return 0.0
+    return float(np.clip(1.0 - 1.0 / wrist_stiffness_scale, 0.0, 0.95))
+
+
+def apply_wrist_tracking_correction(
+    context: RetargetContext,
+    data: mujoco.MjData,
+    qpos_target: np.ndarray,
+    wrist_stiffness_scale: float,
+) -> None:
+    """Make the virtual wrist/root track its target when servo gains are insufficient.
+
+    The wrist/root joints are mocap-style virtual joints, not physical hand
+    joints. For H5 qpos replay we care about the commanded wrist pose, so a
+    scale above 1.0 applies a bounded post-step correction in addition to the
+    MuJoCo position servo gain scaling.
+    """
+    alpha = wrist_tracking_alpha(wrist_stiffness_scale)
+    if alpha <= 0.0:
+        return
+    wrist_qpos_end = min(6, context.object_qpos_start, data.qpos.size)
+    if wrist_qpos_end <= 0:
+        return
+    data.qpos[:wrist_qpos_end] = (
+        (1.0 - alpha) * data.qpos[:wrist_qpos_end]
+        + alpha * qpos_target[:wrist_qpos_end]
+    )
+    wrist_qvel_end = min(6, data.qvel.size)
+    data.qvel[:wrist_qvel_end] = 0.0
 
 
 def pin_frozen_joints(
@@ -828,6 +902,7 @@ def project_one_frame_collision_aware(
     pair_margin: float,
     safety_margin: float,
     tracking_weight: float,
+    wrist_stiffness_scale: float,
     collision_weight: float,
     max_nfev: int,
     outer_iterations: int,
@@ -849,6 +924,8 @@ def project_one_frame_collision_aware(
     projected = qpos_target.copy()
     x = projected[:robot_width].copy()
     pair_set: set[tuple[int, int]] = set()
+    tracking_weights = np.full(robot_width, tracking_weight, dtype=np.float64)
+    tracking_weights[: min(6, robot_width)] *= wrist_stiffness_scale
 
     for _ in range(max(1, outer_iterations)):
         projected[:robot_width] = x
@@ -875,7 +952,7 @@ def project_one_frame_collision_aware(
                 pair_list,
                 default_distance=pair_margin,
             )
-            tracking_residual = np.sqrt(tracking_weight) * (
+            tracking_residual = np.sqrt(tracking_weights) * (
                 x_candidate - qpos_target[:robot_width]
             )
             collision_residual = np.sqrt(collision_weight) * np.minimum(
@@ -932,6 +1009,7 @@ def settle_one_frame(
     settle_steps: int,
     collision_relax_steps: int,
     max_abs_qpos: float,
+    wrist_stiffness_scale: float,
     ik_contact: np.ndarray | None,
     ik_contact_pos: np.ndarray | None,
     use_ik_contact_fallback: bool,
@@ -953,6 +1031,12 @@ def settle_one_frame(
         prev_qpos = data.qpos.copy()
         mujoco.mj_step(model, data)
         pin_frozen_joints(context, data, qpos_target)
+        apply_wrist_tracking_correction(
+            context,
+            data,
+            qpos_target,
+            wrist_stiffness_scale=wrist_stiffness_scale,
+        )
         clamp_limited_robot_joints(context, data)
         if (
             not np.isfinite(data.qpos).all()
@@ -974,6 +1058,12 @@ def settle_one_frame(
         prev_qpos = data.qpos.copy()
         mujoco.mj_step(model, data)
         pin_frozen_joints(context, data, qpos_target)
+        apply_wrist_tracking_correction(
+            context,
+            data,
+            qpos_target,
+            wrist_stiffness_scale=wrist_stiffness_scale,
+        )
         clamp_limited_robot_joints(context, data)
         if (
             not np.isfinite(data.qpos).all()
@@ -1016,6 +1106,7 @@ def _init_worker(
     clear_contact_exclusions: bool,
     collide_parent_child: bool,
     collision_margin: float,
+    wrist_stiffness_scale: float,
 ) -> None:
     global _WORKER_CONTEXT
     _WORKER_CONTEXT = build_context(
@@ -1032,11 +1123,12 @@ def _init_worker(
         clear_contact_exclusions=clear_contact_exclusions,
         collide_parent_child=collide_parent_child,
         collision_margin=collision_margin,
+        wrist_stiffness_scale=wrist_stiffness_scale,
     )
 
 
 def _settle_frame_worker(
-    payload: tuple[int, np.ndarray, int, int, float, Any, Any, bool],
+    payload: tuple[int, np.ndarray, int, int, float, float, Any, Any, bool],
 ) -> tuple[int, np.ndarray, np.ndarray, np.ndarray]:
     if _WORKER_CONTEXT is None:
         raise RuntimeError("Worker context was not initialized.")
@@ -1046,6 +1138,7 @@ def _settle_frame_worker(
         settle_steps,
         collision_relax_steps,
         max_abs_qpos,
+        wrist_stiffness_scale,
         ik_contact,
         ik_contact_pos,
         use_ik_contact_fallback,
@@ -1056,6 +1149,7 @@ def _settle_frame_worker(
         settle_steps=settle_steps,
         collision_relax_steps=collision_relax_steps,
         max_abs_qpos=max_abs_qpos,
+        wrist_stiffness_scale=wrist_stiffness_scale,
         ik_contact=ik_contact,
         ik_contact_pos=ik_contact_pos,
         use_ik_contact_fallback=use_ik_contact_fallback,
@@ -1067,6 +1161,7 @@ def _project_frame_worker(
     payload: tuple[
         int,
         np.ndarray,
+        float,
         float,
         float,
         float,
@@ -1086,6 +1181,7 @@ def _project_frame_worker(
         pair_margin,
         safety_margin,
         tracking_weight,
+        wrist_stiffness_scale,
         collision_weight,
         max_nfev,
         outer_iterations,
@@ -1099,6 +1195,7 @@ def _project_frame_worker(
         pair_margin=pair_margin,
         safety_margin=safety_margin,
         tracking_weight=tracking_weight,
+        wrist_stiffness_scale=wrist_stiffness_scale,
         collision_weight=collision_weight,
         max_nfev=max_nfev,
         outer_iterations=outer_iterations,
@@ -1129,6 +1226,7 @@ def settle_trajectory(
     clear_contact_exclusions: bool,
     collide_parent_child: bool,
     collision_margin: float,
+    wrist_stiffness_scale: float,
     ik_contact: np.ndarray | None,
     ik_contact_pos: np.ndarray | None,
     use_ik_contact_fallback: bool,
@@ -1154,6 +1252,7 @@ def settle_trajectory(
                 settle_steps=settle_steps,
                 collision_relax_steps=collision_relax_steps,
                 max_abs_qpos=max_abs_qpos,
+                wrist_stiffness_scale=wrist_stiffness_scale,
                 ik_contact=frame_contact,
                 ik_contact_pos=frame_contact_pos,
                 use_ik_contact_fallback=use_ik_contact_fallback,
@@ -1174,6 +1273,7 @@ def settle_trajectory(
                 settle_steps,
                 collision_relax_steps,
                 max_abs_qpos,
+                wrist_stiffness_scale,
                 frame_contact,
                 frame_contact_pos,
                 use_ik_contact_fallback,
@@ -1200,6 +1300,7 @@ def settle_trajectory(
             clear_contact_exclusions,
             collide_parent_child,
             collision_margin,
+            wrist_stiffness_scale,
         ),
     ) as executor:
         for done_count, (frame_idx, settled, cpos, cmask) in enumerate(
@@ -1238,6 +1339,7 @@ def project_collision_aware_trajectory(
     clear_contact_exclusions: bool,
     collide_parent_child: bool,
     collision_margin: float,
+    wrist_stiffness_scale: float,
     pair_margin: float,
     safety_margin: float,
     tracking_weight: float,
@@ -1268,6 +1370,7 @@ def project_collision_aware_trajectory(
                 pair_margin,
                 safety_margin,
                 tracking_weight,
+                wrist_stiffness_scale,
                 collision_weight,
                 max_nfev,
                 outer_iterations,
@@ -1289,6 +1392,7 @@ def project_collision_aware_trajectory(
                 payload_pair_margin,
                 payload_safety_margin,
                 payload_tracking_weight,
+                payload_wrist_stiffness_scale,
                 payload_collision_weight,
                 payload_max_nfev,
                 payload_outer_iterations,
@@ -1302,6 +1406,7 @@ def project_collision_aware_trajectory(
                 pair_margin=payload_pair_margin,
                 safety_margin=payload_safety_margin,
                 tracking_weight=payload_tracking_weight,
+                wrist_stiffness_scale=payload_wrist_stiffness_scale,
                 collision_weight=payload_collision_weight,
                 max_nfev=payload_max_nfev,
                 outer_iterations=payload_outer_iterations,
@@ -1334,6 +1439,7 @@ def project_collision_aware_trajectory(
             clear_contact_exclusions,
             collide_parent_child,
             collision_margin,
+            wrist_stiffness_scale,
         ),
     ) as executor:
         for done_count, (frame_idx, projected, cpos, cmask) in enumerate(
@@ -1351,35 +1457,25 @@ def project_collision_aware_trajectory(
     return projected_qpos, contact_pos, contact_mask
 
 
-def rollout_smoothed_trajectory(
+def rollout_controlled_trajectory(
     context: RetargetContext,
     target_qpos: np.ndarray,
     object_qpos_ref: np.ndarray,
     steps_per_frame: int,
     collision_relax_steps: int,
-    frame_dt: float,
     max_abs_qpos: float,
-    ctrl_lowpass_alpha: float,
-    max_root_linear_velocity: float,
-    max_root_angular_velocity: float,
-    max_joint_velocity: float,
+    wrist_stiffness_scale: float,
     ik_contact: np.ndarray | None,
     ik_contact_pos: np.ndarray | None,
     use_ik_contact_fallback: bool,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Optionally roll controller targets through one sequential MuJoCo simulation.
-
-    DexMachina's retargeting output keeps controller targets separate from the
-    achieved collision-aware qpos. This optional rollout follows the same
-    separation: its qpos is saved as achieved state/contact evidence, not as the
-    replay target trajectory.
-    """
+    """Roll controller targets through one sequential MuJoCo simulation."""
     target_qpos = np.asarray(target_qpos, dtype=np.float64)
     object_qpos_ref = np.asarray(object_qpos_ref, dtype=np.float64)
     total_frames = target_qpos.shape[0]
     num_parts = len(context.contacts.part_names)
     num_links = len(context.contacts.hand_link_names)
-    smoothed_qpos = np.zeros_like(target_qpos)
+    rollout_qpos = np.zeros_like(target_qpos)
     contact_pos = np.zeros((total_frames, num_parts, num_links, 3), dtype=np.float64)
     contact_mask = np.zeros((total_frames, num_parts, num_links), dtype=bool)
 
@@ -1395,21 +1491,16 @@ def rollout_smoothed_trajectory(
     clamp_limited_robot_joints(context, data)
     mujoco.mj_forward(model, data)
 
-    alpha = float(np.clip(ctrl_lowpass_alpha, 0.0, 1.0))
-    if alpha <= 0.0:
-        alpha = 1.0
-
     for frame_idx in range(total_frames):
         if frame_idx % 25 == 0:
-            loguru.logger.info(f"Smoothing frame {frame_idx + 1}/{total_frames}")
+            loguru.logger.info(f"Rolling out frame {frame_idx + 1}/{total_frames}")
 
         frame_target = target_qpos[frame_idx]
         object_target = object_qpos_ref[frame_idx]
         for _ in range(max(1, steps_per_frame)):
-            ctrl_qpos[: context.object_qpos_start] = (
-                (1.0 - alpha) * ctrl_qpos[: context.object_qpos_start]
-                + alpha * frame_target[: context.object_qpos_start]
-            )
+            ctrl_qpos[: context.object_qpos_start] = frame_target[
+                : context.object_qpos_start
+            ]
             ctrl_qpos[context.object_qpos_start :] = object_target[
                 context.object_qpos_start :
             ]
@@ -1419,6 +1510,12 @@ def rollout_smoothed_trajectory(
             prev_qpos = data.qpos.copy()
             mujoco.mj_step(model, data)
             pin_frozen_joints(context, data, object_target)
+            apply_wrist_tracking_correction(
+                context,
+                data,
+                ctrl_qpos,
+                wrist_stiffness_scale=wrist_stiffness_scale,
+            )
             clamp_limited_robot_joints(context, data)
             if (
                 not np.isfinite(data.qpos).all()
@@ -1432,19 +1529,6 @@ def rollout_smoothed_trajectory(
 
         pin_frozen_joints(context, data, object_target)
         clamp_limited_robot_joints(context, data)
-        if frame_idx > 0:
-            data.qpos[:] = clip_robot_qpos_step(
-                context=context,
-                qpos=data.qpos,
-                previous_qpos=smoothed_qpos[frame_idx - 1],
-                frame_dt=frame_dt,
-                max_root_linear_velocity=max_root_linear_velocity,
-                max_root_angular_velocity=max_root_angular_velocity,
-                max_joint_velocity=max_joint_velocity,
-            )
-            data.qvel[:] = 0.0
-            pin_frozen_joints(context, data, object_target)
-            clamp_limited_robot_joints(context, data)
         mujoco.mj_forward(model, data)
 
         for _ in range(collision_relax_steps):
@@ -1457,6 +1541,12 @@ def rollout_smoothed_trajectory(
             prev_qpos = data.qpos.copy()
             mujoco.mj_step(model, data)
             pin_frozen_joints(context, data, object_target)
+            apply_wrist_tracking_correction(
+                context,
+                data,
+                relaxed_target,
+                wrist_stiffness_scale=wrist_stiffness_scale,
+            )
             clamp_limited_robot_joints(context, data)
             if (
                 not np.isfinite(data.qpos).all()
@@ -1482,67 +1572,24 @@ def rollout_smoothed_trajectory(
                 ik_contact=frame_contact,
                 ik_contact_pos=frame_contact_pos,
             )
-        smoothed_qpos[frame_idx] = data.qpos
+        rollout_qpos[frame_idx] = data.qpos
         contact_pos[frame_idx] = cpos
         contact_mask[frame_idx] = cmask
 
-    smoothed_qpos[:, context.object_qpos_start :] = object_qpos_ref[
+    rollout_qpos[:, context.object_qpos_start :] = object_qpos_ref[
         :, context.object_qpos_start :
     ]
-    return smoothed_qpos, contact_pos, contact_mask
-
-
-def clip_robot_qpos_step(
-    context: RetargetContext,
-    qpos: np.ndarray,
-    previous_qpos: np.ndarray,
-    frame_dt: float,
-    max_root_linear_velocity: float,
-    max_root_angular_velocity: float,
-    max_joint_velocity: float,
-) -> np.ndarray:
-    clipped = qpos.copy()
-    robot_width = context.object_qpos_start
-    if robot_width <= 0:
-        return clipped
-
-    max_step = np.full(robot_width, max_joint_velocity * frame_dt, dtype=np.float64)
-    max_step[: min(3, robot_width)] = max_root_linear_velocity * frame_dt
-    if robot_width > 3:
-        max_step[3 : min(6, robot_width)] = max_root_angular_velocity * frame_dt
-
-    delta = clipped[:robot_width] - previous_qpos[:robot_width]
-    clipped[:robot_width] = previous_qpos[:robot_width] + np.clip(
-        delta,
-        -max_step,
-        max_step,
-    )
-    return clipped
+    return rollout_qpos, contact_pos, contact_mask
 
 
 def prepare_target_trajectory(
     context: RetargetContext,
     qpos: np.ndarray,
-    frame_dt: float,
-    max_root_linear_velocity: float,
-    max_root_angular_velocity: float,
-    max_joint_velocity: float,
 ) -> np.ndarray:
     """Prepare DexMachina-style absolute controller targets for saving/replay."""
     target_qpos = clamp_robot_qpos_targets(context, qpos)
     if target_qpos.shape[0] == 0:
         return target_qpos
-
-    for frame_idx in range(1, target_qpos.shape[0]):
-        target_qpos[frame_idx] = clip_robot_qpos_step(
-            context=context,
-            qpos=target_qpos[frame_idx],
-            previous_qpos=target_qpos[frame_idx - 1],
-            frame_dt=frame_dt,
-            max_root_linear_velocity=max_root_linear_velocity,
-            max_root_angular_velocity=max_root_angular_velocity,
-            max_joint_velocity=max_joint_velocity,
-        )
 
     target_qpos[:, context.object_qpos_start :] = qpos[:, context.object_qpos_start :]
     return target_qpos
@@ -1906,7 +1953,7 @@ def main(
     settle_steps: int = 500,
     collision_relax_steps: int = 0,
     num_workers: int = 0,
-    sim_dt: float = 0.002,
+    sim_dt: float = 0.002, # 0.002
     solver_iterations: int = 80,
     solver_tolerance: float = 1e-10,
     integrator: str = "implicitfast",
@@ -1931,16 +1978,10 @@ def main(
     strict_repair_fallback_relax_steps: int = 200,
     repair_bisection_steps: int = 20,
     repair_penetration_tolerance: float = 1e-6,
-    smooth_rollout: bool = False,
-    output_qpos_source: Literal["target", "achieved", "smooth"] = "smooth",
-    rollout_steps_per_frame: int | None = 1,
-    ctrl_lowpass_alpha: float = 1.0,
-    smooth_output_steps_per_frame: int | None = 16,
-    smooth_output_collision_relax_steps: int = 0,
-    smooth_output_ctrl_lowpass_alpha: float = 1.0,
-    max_root_linear_velocity: float = 0.75,
-    max_root_angular_velocity: float = 3.0,
-    max_joint_velocity: float = 3.0,
+    output_qpos_source: Literal["target", "achieved", "rollout"] = "rollout",
+    rollout_target_source: Literal["target", "achieved"] = "target",
+    control_steps_per_frame: int | None = 16,
+    wrist_stiffness_scale: float = 1.0,
     use_ik_contact_fallback: bool = True,
     show_viewer: bool = True,
     viewer_fps: int = 60,
@@ -2001,6 +2042,7 @@ def main(
         clear_contact_exclusions=clear_contact_exclusions,
         collide_parent_child=collide_parent_child,
         collision_margin=collision_margin,
+        wrist_stiffness_scale=wrist_stiffness_scale,
     )
     if qpos.shape[1] != context.model.nq:
         raise ValueError(
@@ -2019,10 +2061,6 @@ def main(
     target_qpos = prepare_target_trajectory(
         context=context,
         qpos=qpos,
-        frame_dt=dt,
-        max_root_linear_velocity=max_root_linear_velocity,
-        max_root_angular_velocity=max_root_angular_velocity,
-        max_joint_velocity=max_joint_velocity,
     )
     target_delta = np.max(
         np.abs(
@@ -2032,13 +2070,12 @@ def main(
     )
     if target_delta > 1e-9:
         loguru.logger.info(
-            "Clamped/smoothed absolute controller targets; "
+            "Clamped absolute controller targets; "
             f"max robot-space change from IK input is {target_delta:.6f}."
         )
 
     if collision_projection:
         projection_context = context
-        rollout_steps = 0
         if projection_backend == "physics":
             loguru.logger.info(
                 "Running DexMachina-style per-frame physics projection with "
@@ -2064,6 +2101,7 @@ def main(
                 clear_contact_exclusions=clear_contact_exclusions,
                 collide_parent_child=collide_parent_child,
                 collision_margin=collision_margin,
+                wrist_stiffness_scale=wrist_stiffness_scale,
                 ik_contact=ik_contact,
                 ik_contact_pos=ik_contact_pos,
                 use_ik_contact_fallback=use_ik_contact_fallback,
@@ -2089,6 +2127,7 @@ def main(
                     clear_contact_exclusions=clear_contact_exclusions,
                     collide_parent_child=collide_parent_child,
                     collision_margin=projection_collision_margin,
+                    wrist_stiffness_scale=wrist_stiffness_scale,
                 )
             achieved_qpos, contact_pos, contact_mask = project_collision_aware_trajectory(
                 context=projection_context,
@@ -2107,6 +2146,7 @@ def main(
                 clear_contact_exclusions=clear_contact_exclusions,
                 collide_parent_child=collide_parent_child,
                 collision_margin=projection_collision_margin,
+                wrist_stiffness_scale=wrist_stiffness_scale,
                 pair_margin=projection_pair_margin,
                 safety_margin=projection_safety_margin,
                 tracking_weight=projection_tracking_weight,
@@ -2146,6 +2186,7 @@ def main(
                 clear_contact_exclusions=clear_contact_exclusions,
                 collide_parent_child=collide_parent_child,
                 collision_margin=collision_margin,
+                wrist_stiffness_scale=wrist_stiffness_scale,
                 ik_contact=None,
                 ik_contact_pos=None,
                 use_ik_contact_fallback=False,
@@ -2153,21 +2194,17 @@ def main(
             loguru.logger.info(
                 "Building conservative collision-free fallback for strict repair."
             )
-            fallback_safe_qpos, _, _ = rollout_smoothed_trajectory(
+            fallback_safe_qpos, _, _ = rollout_controlled_trajectory(
                 context=context,
                 target_qpos=target_qpos,
-                object_qpos_ref=target_qpos,
-                steps_per_frame=1,
-                collision_relax_steps=strict_repair_fallback_relax_steps,
-                frame_dt=dt,
-                max_abs_qpos=max_abs_qpos,
-                ctrl_lowpass_alpha=1.0,
-                max_root_linear_velocity=max_root_linear_velocity,
-                max_root_angular_velocity=max_root_angular_velocity,
-                max_joint_velocity=max_joint_velocity,
-                ik_contact=None,
-                ik_contact_pos=None,
-                use_ik_contact_fallback=False,
+            object_qpos_ref=target_qpos,
+            steps_per_frame=1,
+            collision_relax_steps=strict_repair_fallback_relax_steps,
+            max_abs_qpos=max_abs_qpos,
+            wrist_stiffness_scale=wrist_stiffness_scale,
+            ik_contact=None,
+            ik_contact_pos=None,
+            use_ik_contact_fallback=False,
             )
             safe_qpos, _, _ = repair_hand_penetration_by_line_search(
                 context=context,
@@ -2201,31 +2238,6 @@ def main(
                 ik_contact_pos=ik_contact_pos,
                 use_ik_contact_fallback=use_ik_contact_fallback,
             )
-    elif smooth_rollout:
-        if rollout_steps_per_frame is None:
-            rollout_steps = max(1, int(round(dt / sim_dt)))
-        else:
-            rollout_steps = max(1, rollout_steps_per_frame)
-        loguru.logger.info(
-            "Running sequential smoothing rollout with "
-            f"{rollout_steps} MuJoCo steps per frame."
-        )
-        achieved_qpos, contact_pos, contact_mask = rollout_smoothed_trajectory(
-            context=context,
-            target_qpos=target_qpos,
-            object_qpos_ref=target_qpos,
-            steps_per_frame=rollout_steps,
-            collision_relax_steps=collision_relax_steps,
-            frame_dt=dt,
-            max_abs_qpos=max_abs_qpos,
-            ctrl_lowpass_alpha=ctrl_lowpass_alpha,
-            max_root_linear_velocity=max_root_linear_velocity,
-            max_root_angular_velocity=max_root_angular_velocity,
-            max_joint_velocity=max_joint_velocity,
-            ik_contact=ik_contact,
-            ik_contact_pos=ik_contact_pos,
-            use_ik_contact_fallback=use_ik_contact_fallback,
-        )
     else:
         stage1_achieved_qpos, stage1_contact_pos, stage1_contact_mask = settle_trajectory(
             context=context,
@@ -2247,55 +2259,58 @@ def main(
             clear_contact_exclusions=clear_contact_exclusions,
             collide_parent_child=collide_parent_child,
             collision_margin=collision_margin,
+            wrist_stiffness_scale=wrist_stiffness_scale,
             ik_contact=ik_contact,
             ik_contact_pos=ik_contact_pos,
             use_ik_contact_fallback=use_ik_contact_fallback,
         )
-        rollout_steps = 0
         achieved_qpos = stage1_achieved_qpos
         contact_pos = stage1_contact_pos
         contact_mask = stage1_contact_mask
 
     achieved_contact_pos = contact_pos
     achieved_contact_mask = contact_mask
-    smooth_qpos: np.ndarray | None = None
-    smooth_contact_pos: np.ndarray | None = None
-    smooth_contact_mask: np.ndarray | None = None
-    smooth_output_steps = 0
+    rollout_qpos: np.ndarray | None = None
+    rollout_contact_pos: np.ndarray | None = None
+    rollout_contact_mask: np.ndarray | None = None
+    if control_steps_per_frame is None:
+        stage2_control_steps = max(1, int(round(dt / sim_dt)))
+    else:
+        stage2_control_steps = max(1, control_steps_per_frame)
 
-    if output_qpos_source == "smooth":
-        if smooth_output_steps_per_frame is None:
-            smooth_output_steps = max(1, int(round(dt / sim_dt)))
-        else:
-            smooth_output_steps = max(1, smooth_output_steps_per_frame)
+    if output_qpos_source == "rollout":
         loguru.logger.info(
-            "Building DexMachina-style smooth replay by rolling out the "
-            "collision-aware target in one MuJoCo environment "
-            f"({smooth_output_steps} steps per frame)."
+            "Building DexMachina-style stage-2 replay by rolling out the "
+            f"{rollout_target_source} controller target in one MuJoCo environment "
+            f"({stage2_control_steps} control steps per frame)."
         )
-        smooth_target_qpos = achieved_qpos.copy()
-        smooth_target_qpos[:, context.object_qpos_start :] = target_qpos[
-            :, context.object_qpos_start :
-        ]
-        smooth_qpos, smooth_contact_pos, smooth_contact_mask = rollout_smoothed_trajectory(
+        if rollout_target_source == "target":
+            rollout_target_qpos = target_qpos.copy()
+        elif rollout_target_source == "achieved":
+            rollout_target_qpos = achieved_qpos.copy()
+            rollout_target_qpos[:, context.object_qpos_start :] = target_qpos[
+                :, context.object_qpos_start :
+            ]
+        else:
+            raise ValueError(
+                f"Unknown rollout_target_source `{rollout_target_source}`. "
+                "Choose `target` or `achieved`."
+            )
+        rollout_qpos, rollout_contact_pos, rollout_contact_mask = rollout_controlled_trajectory(
             context=context,
-            target_qpos=smooth_target_qpos,
+            target_qpos=rollout_target_qpos,
             object_qpos_ref=target_qpos,
-            steps_per_frame=smooth_output_steps,
-            collision_relax_steps=smooth_output_collision_relax_steps,
-            frame_dt=dt,
+            steps_per_frame=stage2_control_steps,
+            collision_relax_steps=0,
             max_abs_qpos=max_abs_qpos,
-            ctrl_lowpass_alpha=smooth_output_ctrl_lowpass_alpha,
-            max_root_linear_velocity=max_root_linear_velocity,
-            max_root_angular_velocity=max_root_angular_velocity,
-            max_joint_velocity=max_joint_velocity,
+            wrist_stiffness_scale=wrist_stiffness_scale,
             ik_contact=ik_contact,
             ik_contact_pos=ik_contact_pos,
             use_ik_contact_fallback=use_ik_contact_fallback,
         )
-        output_qpos = smooth_qpos
-        output_contact_pos = smooth_contact_pos
-        output_contact_mask = smooth_contact_mask
+        output_qpos = rollout_qpos
+        output_contact_pos = rollout_contact_pos
+        output_contact_mask = rollout_contact_mask
     elif output_qpos_source == "achieved":
         output_qpos = achieved_qpos
         output_contact_pos = achieved_contact_pos
@@ -2328,11 +2343,11 @@ def main(
         robot_type=robot_type,
         robot_joint_count=robot_joint_count,
     )
-    smooth_components = (
+    rollout_components = (
         None
-        if smooth_qpos is None
+        if rollout_qpos is None
         else split_mink_qpos(
-            qpos=smooth_qpos,
+            qpos=rollout_qpos,
             robot_type=robot_type,
             robot_joint_count=robot_joint_count,
         )
@@ -2341,9 +2356,9 @@ def main(
         h5_data[f"target_{key}"] = value
     for key, value in achieved_components.items():
         h5_data[f"achieved_{key}"] = value
-    if smooth_components is not None:
-        for key, value in smooth_components.items():
-            h5_data[f"smooth_{key}"] = value
+    if rollout_components is not None:
+        for key, value in rollout_components.items():
+            h5_data[f"rollout_{key}"] = value
 
     contact_links = make_contact_links(
         contact_pos=output_contact_pos,
@@ -2355,8 +2370,8 @@ def main(
     output_penetration = compute_penetration_stats(context, output_qpos)
     target_penetration = compute_penetration_stats(context, target_qpos)
     achieved_penetration = compute_penetration_stats(context, achieved_qpos)
-    smooth_penetration = (
-        None if smooth_qpos is None else compute_penetration_stats(context, smooth_qpos)
+    rollout_penetration = (
+        None if rollout_qpos is None else compute_penetration_stats(context, rollout_qpos)
     )
     h5_data.update(
         {
@@ -2375,18 +2390,18 @@ def main(
             "achieved_contact_mask": achieved_contact_mask,
         }
     )
-    if smooth_qpos is not None:
-        h5_data["smooth_qpos"] = smooth_qpos
-        h5_data["smooth_qvel"] = compute_qvel(context.model, smooth_qpos, dt=dt)
+    if rollout_qpos is not None:
+        h5_data["rollout_qpos"] = rollout_qpos
+        h5_data["rollout_qvel"] = compute_qvel(context.model, rollout_qpos, dt=dt)
     for key, value in output_penetration.items():
         h5_data[key] = value
     for key, value in target_penetration.items():
         h5_data[f"target_{key}"] = value
     for key, value in achieved_penetration.items():
         h5_data[f"achieved_{key}"] = value
-    if smooth_penetration is not None:
-        for key, value in smooth_penetration.items():
-            h5_data[f"smooth_{key}"] = value
+    if rollout_penetration is not None:
+        for key, value in rollout_penetration.items():
+            h5_data[f"rollout_{key}"] = value
 
     loguru.logger.info(
         "Penetration stats for saved qpos: "
@@ -2406,19 +2421,9 @@ def main(
         "data_id": int(data_id),
         "settle_steps": int(settle_steps),
         "collision_relax_steps": int(collision_relax_steps),
-        "smooth_rollout": int(smooth_rollout),
-        "rollout_steps_per_frame": int(rollout_steps),
-        "ctrl_lowpass_alpha": float(ctrl_lowpass_alpha),
-        "smooth_output_steps_per_frame": int(smooth_output_steps),
-        "smooth_output_collision_relax_steps": int(
-            smooth_output_collision_relax_steps
-        ),
-        "smooth_output_ctrl_lowpass_alpha": float(
-            smooth_output_ctrl_lowpass_alpha
-        ),
-        "max_root_linear_velocity": float(max_root_linear_velocity),
-        "max_root_angular_velocity": float(max_root_angular_velocity),
-        "max_joint_velocity": float(max_joint_velocity),
+        "control_steps_per_frame": int(stage2_control_steps),
+        "rollout_target_source": rollout_target_source,
+        "wrist_stiffness_scale": float(wrist_stiffness_scale),
         "sim_dt": float(sim_dt),
         "integrator": integrator,
         "object_qpos_start": int(context.object_qpos_start),
