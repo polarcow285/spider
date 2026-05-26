@@ -544,7 +544,8 @@
 
             <!-- Revolute joint -->
             <joint name="scissors_joint" type="hinge" axis="0 0 -1"
-                    limited="true" range="0 0.5"/>
+                    damping="0.1" frictionloss="0.05"
+                    limited="true" range="0 2.0"/>
         </body>
     </body>
 

@@ -1,4 +1,4 @@
-# Sync this file with uv.lock when updating dependencies.
+# Pip-style pins (use with `pip install -r requirements.txt` in your conda env).
 numpy==2.3.4
 torch==2.9.0
 loguru==0.7.3
@@ -13,5 +13,6 @@ rerun-sdk==0.26.2
 ipdb==0.13.13
 pymeshlab==2025.7
 open3d==0.19.0
-mujoco-warp @ git+https://github.com/google-deepmind/mujoco_warp@5d5a6450a7699e695f1767efd7715251713da2ac
+# Pin newer than 2025-11: older mujoco_warp imports removed `warp.context` (warp-lang>=1.13).
+mujoco-warp @ git+https://github.com/google-deepmind/mujoco_warp@9fca8f7dccc0a609b90e2d47428fda5a7d321f95
 newton[examples] @ git+https://github.com/newton-physics/newton.git@e15698684b6bfa4c501d49fe938a2837e112380c
