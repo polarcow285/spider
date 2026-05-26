@@ -350,7 +350,7 @@ def main(
         trajectory_name = (
             f"trajectory_dexmachina_minimal_{robot_type}.npz"
             if dexmachina
-            else "trajectory_kinematic_mink.npz"
+            else f"trajectory_kinematic_mink_{robot_type}_{task}.npz"
         )
         trajectory_path = os.path.join(processed_dir, trajectory_name)
     if model_path is None:
