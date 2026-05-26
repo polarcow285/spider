@@ -1,13 +1,24 @@
 """
-Convert trajectory_kinematic_mink.npz to an H5 retargeted trajectory for Isaac/DexRL.
+Convert a retargeted NPZ trajectory to an H5 trajectory for Isaac/DexRL.
 
-Input format: npz file 'trajectory_kinematic_mink.npz'
+Default input format: npz file 'trajectory_kinematic_mink.npz'
 Keys:
-    qpos: shape=(T, nq), ik_mink MuJoCo qpos.
+    qpos: shape=(T, nq), MuJoCo qpos.
     frequency: scalar, optional metadata.
+
+With --dexmachina, the input defaults to
+'trajectory_dexmachina_minimal_{robot_type}.npz' and also contains:
+    contact_pos: shape=(T, num_object_parts, num_hand_links, 3), float64
+    contact_mask: shape=(T, num_object_parts, num_hand_links), bool
+    contact_links: shape=(T, num_object_parts, num_hand_links, 4), float64
+        xyz plus DexMachina-style part id (1=top, 2=bottom when available)
+    contact_part_names: shape=(num_object_parts,), str
+    contact_link_names: shape=(num_hand_links,), str
 
 Output format: h5 file 'mink_retargeted_{robot_type}_{task}.h5' compatible with
 replay_retargeted_traj.py / dexrl.data.arctic.load_retargeted_traj.
+With --dexmachina, the output file is named
+'dexmachina_retargeted_{robot_type}_{task}.h5'.
 Saved by default in spider/postprocess/mink/.
 Keys:
     object_pos: shape=(T, 3), float64
@@ -19,13 +30,17 @@ Keys:
     robot_joints: shape=(T, n_hand_dof), float64
     robot_keypoints: shape=(T, 17, 3) for leap or (T, 21, 3) for wuji,
         float64; wrist keypoint followed by hand joint anchors in robot_joints order.
+    contact: H5 group containing the DexMachina contact keys above when
+        --dexmachina is enabled.
 
-Expected ik_mink qpos layout:
+Expected qpos layout:
     [robot_pos_xyz(3), robot_euler_XYZ(3), robot_finger_joints,
      object_pos_xyz(3), object_quat_wxyz(4), optional_object_joint]
 
 Example usage:
-    python spider/postprocess/isaac.py --task scissors --embodiment-type right --dataset-dir example_datasets --dataset-name arctic --robot-type leap
+    python spider/postprocess/isaac.py \
+        --task scissors --embodiment-type right \
+        --dataset-dir example_datasets --dataset-name arctic --robot-type leap
 """
 
 from __future__ import annotations
@@ -54,6 +69,14 @@ DEFAULT_ROBOT_KEYPOINT_COUNTS = {
     "leap": 17,
     "wuji": 21,
 }
+
+CONTACT_KEYS = (
+    "contact_pos",
+    "contact_mask",
+    "contact_links",
+    "contact_part_names",
+    "contact_link_names",
+)
 
 
 def default_robot_joint_count(robot_type: str) -> int:
@@ -238,11 +261,62 @@ def compute_robot_keypoints(
     return keypoints, [wrist_name, *joint_names]
 
 
-def write_h5(path: str, data: dict[str, np.ndarray], attrs: dict[str, str | float]) -> None:
+def load_contact_data(
+    trajectory: np.lib.npyio.NpzFile,
+    frame_slice: slice,
+    num_frames: int,
+) -> dict[str, np.ndarray]:
+    missing = [key for key in CONTACT_KEYS if key not in trajectory]
+    if missing:
+        raise KeyError(f"DexMachina input is missing contact keys: {missing}.")
+
+    contact = {
+        "contact_pos": np.asarray(trajectory["contact_pos"], dtype=np.float64)[
+            frame_slice
+        ],
+        "contact_mask": np.asarray(trajectory["contact_mask"], dtype=bool)[
+            frame_slice
+        ],
+        "contact_links": np.asarray(trajectory["contact_links"], dtype=np.float64)[
+            frame_slice
+        ],
+        "contact_part_names": np.asarray(trajectory["contact_part_names"]),
+        "contact_link_names": np.asarray(trajectory["contact_link_names"]),
+    }
+    if contact["contact_pos"].shape != contact["contact_mask"].shape + (3,):
+        raise ValueError("contact_pos must have shape contact_mask.shape + (3,).")
+    if contact["contact_links"].shape != contact["contact_mask"].shape + (4,):
+        raise ValueError("contact_links must have shape contact_mask.shape + (4,).")
+    if contact["contact_pos"].shape[0] != num_frames:
+        raise ValueError("Contact frame count does not match selected qpos frames.")
+    if contact["contact_part_names"].shape[0] != contact["contact_pos"].shape[1]:
+        raise ValueError("contact_part_names length does not match contact_pos.")
+    if contact["contact_link_names"].shape[0] != contact["contact_pos"].shape[2]:
+        raise ValueError("contact_link_names length does not match contact_pos.")
+    return contact
+
+
+def write_group(group: h5py.Group, data: dict[str, np.ndarray]) -> None:
+    string_dtype = h5py.string_dtype(encoding="utf-8")
+    for key, value in data.items():
+        if value.dtype.kind in {"U", "S", "O"}:
+            group.create_dataset(key, data=value.astype(string_dtype))
+        else:
+            group.create_dataset(key, data=value)
+
+
+def write_h5(
+    path: str,
+    data: dict[str, np.ndarray],
+    attrs: dict[str, str | float],
+    contact: dict[str, np.ndarray] | None = None,
+) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with h5py.File(path, "w") as h5_file:
         for key, value in data.items():
             h5_file.create_dataset(key, data=value.astype(np.float64))
+        if contact is not None:
+            write_group(h5_file.create_group("contact"), contact)
         for key, value in attrs.items():
             h5_file.attrs[key] = value
 
@@ -259,6 +333,7 @@ def main(
     output_path: str | None = None,
     output_dir: str | None = None,
     robot_joint_count: int | None = None,
+    dexmachina: bool = False,
     start_idx: int = 0,
     end_idx: int = -1,
 ):
@@ -272,26 +347,45 @@ def main(
         data_id=data_id,
     )
     if trajectory_path is None:
-        trajectory_path = os.path.join(processed_dir, "trajectory_kinematic_mink.npz")
+        trajectory_name = (
+            f"trajectory_dexmachina_minimal_{robot_type}.npz"
+            if dexmachina
+            else "trajectory_kinematic_mink.npz"
+        )
+        trajectory_path = os.path.join(processed_dir, trajectory_name)
     if model_path is None:
         model_path = os.path.join(processed_dir, "..", "scene.xml")
     if output_dir is None:
         output_dir = os.path.join(Path(__file__).resolve().parent, "mink")
     if output_path is None:
-        output_path = os.path.join(output_dir, f"mink_retargeted_{robot_type}_{task}.h5")
+        output_name = (
+            f"dexmachina_retargeted_{robot_type}_{task}.h5"
+            if dexmachina
+            else f"mink_retargeted_{robot_type}_{task}.h5"
+        )
+        output_path = os.path.join(output_dir, output_name)
 
     trajectory_path = os.path.abspath(trajectory_path)
     model_path = os.path.abspath(model_path)
     output_path = os.path.abspath(output_path)
 
-    loguru.logger.info(f"Loading Mink trajectory from {trajectory_path}")
+    source_name = "DexMachina" if dexmachina else "Mink"
+    loguru.logger.info(f"Loading {source_name} trajectory from {trajectory_path}")
     with np.load(trajectory_path) as trajectory:
         qpos = trajectory["qpos"]
-        frequency = float(trajectory["frequency"]) if "frequency" in trajectory else np.nan
-
-    qpos = qpos.reshape(-1, qpos.shape[-1])
-    end = None if end_idx == -1 else end_idx
-    qpos = qpos[start_idx:end]
+        frequency = (
+            float(trajectory["frequency"])
+            if "frequency" in trajectory
+            else np.nan
+        )
+        qpos = qpos.reshape(-1, qpos.shape[-1])
+        frame_slice = slice(start_idx, None if end_idx == -1 else end_idx)
+        qpos = qpos[frame_slice]
+        contact = (
+            load_contact_data(trajectory, frame_slice, qpos.shape[0])
+            if dexmachina
+            else None
+        )
 
     h5_data = split_mink_qpos(
         qpos=qpos,
@@ -336,7 +430,7 @@ def main(
             "in qpos order."
         )
 
-    write_h5(output_path, h5_data, attrs)
+    write_h5(output_path, h5_data, attrs, contact=contact)
     loguru.logger.info(
         "Saved Isaac/DexRL retargeted H5 to "
         f"{output_path} with {qpos.shape[0]} frames and "

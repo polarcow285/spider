@@ -17,6 +17,18 @@ contact fallback -- those are SPIDER additions that live in
 ``ik_dexmachina.py``. This file is intentionally kept small so it is easy to
 audit against the paper / reference repo.
 
+Additional DexMachina-style contact keys saved beside ``qpos`` in the NPZ:
+    contact_pos: shape=(T, num_object_parts, num_hand_links, 3), float64
+    contact_mask: shape=(T, num_object_parts, num_hand_links), bool
+    contact_links: shape=(T, num_object_parts, num_hand_links, 4), float64
+        xyz plus DexMachina-style part id (1=top, 2=bottom when available)
+    contact_part_names: shape=(num_object_parts,), str
+    contact_link_names: shape=(num_hand_links,), str
+
+The optional replay viewer can draw contact points from contact_pos/contact_mask
+and active collision-pair lines in a separate transparent contact view when
+``--visualize-contacts`` is passed.
+
 Input format: ``trajectory_kinematic*.npz`` produced by the SPIDER IK stages,
 with ``qpos`` arranged as
 
@@ -30,14 +42,15 @@ equal to the input (since the object is pinned during settling).
 Example:
     python spider/postprocess/ik_dexmachina_minimal.py \
         --task scissors --embodiment-type right \
-        --dataset-dir example_datasets --dataset-name arctic --robot-type leap
+        --dataset-dir example_datasets --dataset-name arctic --robot-type leap \
+        --visualize-contacts
 """
 
 from __future__ import annotations
 
 import os
+from contextlib import ExitStack
 from dataclasses import dataclass
-from pathlib import Path
 
 import loguru
 import mujoco
@@ -46,6 +59,15 @@ import numpy as np
 import tyro
 
 from spider.io import get_processed_data_dir
+from spider.postprocess.ik_dexmachina import (
+    SceneContacts,
+    build_scene_contacts,
+    extract_contacts_for_trajectory,
+    make_contact_links,
+    make_contact_view_context,
+    set_replay_frame,
+    sync_contact_viewer,
+)
 
 
 @dataclass(frozen=True)
@@ -53,11 +75,12 @@ class Context:
     """Everything we need to drive a single MuJoCo instance for retargeting."""
 
     model: mujoco.MjModel
-    actuator_qpos_addr: np.ndarray   # qpos index that each actuator drives (-1 if N/A)
-    actuator_ctrlrange: np.ndarray   # (nu, 2)
-    actuator_ctrllimited: np.ndarray # (nu,) bool
-    object_qpos_start: int           # first qpos index that belongs to the object
-    object_qvel_start: int           # corresponding qvel index
+    actuator_qpos_addr: np.ndarray  # qpos index each actuator drives (-1 if N/A)
+    actuator_ctrlrange: np.ndarray  # (nu, 2)
+    actuator_ctrllimited: np.ndarray  # (nu,) bool
+    object_qpos_start: int  # first qpos index that belongs to the object
+    object_qvel_start: int  # corresponding qvel index
+    contacts: SceneContacts
 
 
 def joint_qpos_width(joint_type: int) -> int:
@@ -105,12 +128,14 @@ def infer_object_qpos_start(
         return int(override)
     valid_addr = actuator_qpos_addr[actuator_qpos_addr >= 0]
     if valid_addr.size == 0:
-        raise ValueError("Could not infer object_qpos_start: no joint actuators in model.")
+        raise ValueError(
+            "Could not infer object_qpos_start: no joint actuators in model."
+        )
     return int(valid_addr.max()) + 1
 
 
 def infer_object_qvel_start(model: mujoco.MjModel, object_qpos_start: int) -> int:
-    """Find the qvel index of the first joint whose qpos starts at or after object_qpos_start."""
+    """Find the qvel index for the first joint at or after object_qpos_start."""
     candidates: list[int] = []
     for joint_id in range(model.njnt):
         if int(model.jnt_qposadr[joint_id]) >= object_qpos_start:
@@ -164,10 +189,21 @@ def build_context(
     return Context(
         model=model,
         actuator_qpos_addr=actuator_qpos_addr,
-        actuator_ctrlrange=np.asarray(model.actuator_ctrlrange, dtype=np.float64).copy(),
-        actuator_ctrllimited=np.asarray(model.actuator_ctrllimited, dtype=np.int32).copy(),
+        actuator_ctrlrange=np.asarray(
+            model.actuator_ctrlrange,
+            dtype=np.float64,
+        ).copy(),
+        actuator_ctrllimited=np.asarray(
+            model.actuator_ctrllimited,
+            dtype=np.int32,
+        ).copy(),
         object_qpos_start=obj_start,
         object_qvel_start=obj_qvel_start,
+        contacts=build_scene_contacts(
+            model,
+            object_qpos_start=obj_start,
+            max_object_parts=2,
+        ),
     )
 
 
@@ -243,9 +279,7 @@ def settle_trajectory(
     total_frames = qpos.shape[0]
     for frame_idx in range(total_frames):
         if frame_idx % max(1, log_every) == 0:
-            loguru.logger.info(
-                f"Settling frame {frame_idx + 1}/{total_frames}"
-            )
+            loguru.logger.info(f"Settling frame {frame_idx + 1}/{total_frames}")
         settled[frame_idx] = settle_one_frame(
             context=context,
             qpos_target=qpos[frame_idx],
@@ -311,32 +345,105 @@ def resolve_trajectory_path(
 def load_input_npz(path: str) -> tuple[np.ndarray, float]:
     with np.load(path) as trajectory:
         qpos = np.asarray(trajectory["qpos"], dtype=np.float64)
-        frequency = float(trajectory["frequency"]) if "frequency" in trajectory else float("nan")
+        frequency = (
+            float(trajectory["frequency"])
+            if "frequency" in trajectory
+            else float("nan")
+        )
     return qpos.reshape(-1, qpos.shape[-1]), frequency
 
 
-def save_output_npz(path: str, qpos: np.ndarray, frequency: float) -> None:
+def save_output_npz(
+    path: str,
+    qpos: np.ndarray,
+    frequency: float,
+    contact_pos: np.ndarray,
+    contact_mask: np.ndarray,
+    contact_links: np.ndarray,
+    contacts: SceneContacts,
+) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    payload: dict[str, np.ndarray] = {"qpos": qpos.astype(np.float64)}
+    payload: dict[str, np.ndarray] = {
+        "qpos": qpos.astype(np.float64),
+        "contact_pos": contact_pos,
+        "contact_mask": contact_mask,
+        "contact_links": contact_links,
+        "contact_part_names": np.asarray(contacts.part_names),
+        "contact_link_names": np.asarray(contacts.hand_link_names),
+    }
     if not np.isnan(frequency):
         payload["frequency"] = np.array(frequency, dtype=np.float64)
     np.savez(path, **payload)
 
 
-def replay_viewer(model: mujoco.MjModel, qpos: np.ndarray, fps: int) -> None:
+def replay_viewer(
+    context: Context,
+    qpos: np.ndarray,
+    fps: int,
+    visualize_contacts: bool,
+    contact_pos: np.ndarray | None,
+    contact_mask: np.ndarray | None,
+) -> None:
     try:
         from loop_rate_limiters import RateLimiter
     except ImportError:
         RateLimiter = None
+
+    model = context.model
     data = mujoco.MjData(model)
+    contact_context = (
+        make_contact_view_context(context, contact_view_alpha=0.28)
+        if visualize_contacts
+        else None
+    )
+    contact_data = (
+        mujoco.MjData(contact_context.model)
+        if contact_context is not None
+        else None
+    )
     frame_idx = 0
     rate_limiter = RateLimiter(fps) if RateLimiter is not None else None
-    with mujoco.viewer.launch_passive(model, data) as viewer:
-        while viewer.is_running():
-            data.qpos[:] = qpos[frame_idx]
-            data.qvel[:] = 0.0
-            mujoco.mj_forward(model, data)
-            viewer.sync()
+
+    with ExitStack() as stack:
+        viewer = stack.enter_context(mujoco.viewer.launch_passive(model, data))
+        contact_viewer = (
+            stack.enter_context(
+                mujoco.viewer.launch_passive(contact_context.model, contact_data)
+            )
+            if contact_context is not None and contact_data is not None
+            else None
+        )
+
+        def any_viewer_running() -> bool:
+            return viewer.is_running() or (
+                contact_viewer is not None and contact_viewer.is_running()
+            )
+
+        while any_viewer_running():
+            if viewer.is_running():
+                set_replay_frame(model, data, qpos[frame_idx])
+                viewer.sync()
+
+            if (
+                contact_viewer is not None
+                and contact_viewer.is_running()
+                and contact_context is not None
+                and contact_data is not None
+            ):
+                sync_contact_viewer(
+                    contact_context,
+                    contact_data,
+                    contact_viewer,
+                    frame_idx,
+                    qpos,
+                    contact_pos,
+                    contact_mask,
+                    contact_visualization="both",
+                    contact_point_radius=0.006,
+                    contact_line_width=0.0015,
+                    visualize_hand_self_contacts=False,
+                )
+
             frame_idx = (frame_idx + 1) % qpos.shape[0]
             if rate_limiter is not None:
                 rate_limiter.sleep()
@@ -364,6 +471,7 @@ def main(
     smooth_steps_per_frame: int = 16,
     show_viewer: bool = True,
     viewer_fps: int = 60,
+    visualize_contacts: bool = False,
 ) -> str:
     """Run the minimal faithful DexMachina post-processing pass.
 
@@ -427,7 +535,10 @@ def main(
     loguru.logger.info(
         f"Robot qpos: [0:{context.object_qpos_start}] | "
         f"Object qpos: [{context.object_qpos_start}:{context.model.nq}] | "
-        f"Object qvel: [{context.object_qvel_start}:{context.model.nv}]"
+        f"Object qvel: [{context.object_qvel_start}:{context.model.nv}] | "
+        f"Contacts: {len(context.contacts.part_names)} object parts "
+        f"({context.contacts.part_names}) and "
+        f"{len(context.contacts.hand_link_names)} hand collision links"
     )
 
     loguru.logger.info(
@@ -454,7 +565,28 @@ def main(
         )
         achieved[:, context.object_qpos_start :] = qpos[:, context.object_qpos_start :]
 
-    save_output_npz(output_path, achieved, frequency)
+    contact_pos, contact_mask = extract_contacts_for_trajectory(
+        context,
+        achieved,
+        ik_contact=None,
+        ik_contact_pos=None,
+        use_ik_contact_fallback=False,
+    )
+    contact_links = make_contact_links(
+        contact_pos=contact_pos,
+        contact_mask=contact_mask,
+        part_ids=context.contacts.part_ids,
+    )
+
+    save_output_npz(
+        output_path,
+        achieved,
+        frequency,
+        contact_pos=contact_pos,
+        contact_mask=contact_mask,
+        contact_links=contact_links,
+        contacts=context.contacts,
+    )
     loguru.logger.info(
         f"Saved collision-free trajectory to {output_path} "
         f"with {achieved.shape[0]} frames."
@@ -462,7 +594,14 @@ def main(
 
     if show_viewer:
         loguru.logger.info("Opening MuJoCo viewer for the settled trajectory.")
-        replay_viewer(context.model, achieved, fps=viewer_fps)
+        replay_viewer(
+            context,
+            achieved,
+            fps=viewer_fps,
+            visualize_contacts=visualize_contacts,
+            contact_pos=contact_pos,
+            contact_mask=contact_mask,
+        )
 
     return output_path
 

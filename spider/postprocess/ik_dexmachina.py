@@ -36,16 +36,22 @@ Additional DexMachina-style contact keys:
     target_qpos: shape=(T, nq), float64, absolute controller targets
     rollout_qpos: shape=(T, nq), float64, stage-2 controlled rollout state
 
+The optional replay viewer can draw contact points from contact_pos/contact_mask
+and active collision-pair lines in either a separate transparent contact view or
+as an overlay on the regular MuJoCo viewer.
+
 Example:
     python spider/postprocess/ik_dexmachina.py --task scissors --embodiment-type right --dataset-dir example_datasets --dataset-name arctic --robot-type leap
 """
 
 from __future__ import annotations
 
+import copy
 import os
 import xml.etree.ElementTree as ET
 from concurrent.futures import ProcessPoolExecutor
-from dataclasses import dataclass
+from contextlib import ExitStack
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Literal
 
@@ -66,6 +72,16 @@ PART_ID_BY_NAME = {
     "top": 1,
     "bottom": 2,
 }
+
+CONTACT_PART_COLORS = np.array(
+    [
+        [1.0, 0.25, 0.05, 1.0],
+        [0.05, 0.7, 1.0, 1.0],
+        [0.7, 0.2, 1.0, 1.0],
+        [0.2, 0.9, 0.35, 1.0],
+    ],
+    dtype=np.float32,
+)
 
 _WORKER_CONTEXT: "RetargetContext | None" = None
 
@@ -1852,6 +1868,389 @@ def extract_contacts_for_trajectory(
     return contact_pos, contact_mask
 
 
+def contact_part_color(part_index: int, alpha: float = 1.0) -> np.ndarray:
+    color = CONTACT_PART_COLORS[part_index % len(CONTACT_PART_COLORS)].copy()
+    color[3] = alpha
+    return color
+
+
+def next_scene_geom(scene: Any) -> Any | None:
+    if scene is None:
+        return None
+    maxgeom = getattr(scene, "maxgeom", len(getattr(scene, "geoms", [])))
+    if int(scene.ngeom) >= int(maxgeom):
+        return None
+    geom = scene.geoms[int(scene.ngeom)]
+    scene.ngeom += 1
+    return geom
+
+
+def add_scene_sphere(
+    scene: Any,
+    pos: np.ndarray,
+    radius: float,
+    rgba: np.ndarray,
+) -> bool:
+    pos = np.asarray(pos, dtype=np.float64)
+    if pos.shape != (3,) or not np.isfinite(pos).all():
+        return False
+    geom = next_scene_geom(scene)
+    if geom is None:
+        return False
+    mujoco.mjv_initGeom(
+        geom,
+        mujoco.mjtGeom.mjGEOM_SPHERE,
+        np.array([radius, radius, radius], dtype=np.float64),
+        pos,
+        np.eye(3, dtype=np.float64).reshape(-1),
+        np.asarray(rgba, dtype=np.float32),
+    )
+    return True
+
+
+def add_scene_capsule(
+    scene: Any,
+    start: np.ndarray,
+    end: np.ndarray,
+    radius: float,
+    rgba: np.ndarray,
+) -> bool:
+    start = np.asarray(start, dtype=np.float64)
+    end = np.asarray(end, dtype=np.float64)
+    if start.shape != (3,) or end.shape != (3,):
+        return False
+    if not np.isfinite(start).all() or not np.isfinite(end).all():
+        return False
+    if np.linalg.norm(end - start) < 1e-9:
+        return False
+    geom = next_scene_geom(scene)
+    if geom is None:
+        return False
+    mujoco.mjv_initGeom(
+        geom,
+        mujoco.mjtGeom.mjGEOM_CAPSULE,
+        np.zeros(3, dtype=np.float64),
+        np.zeros(3, dtype=np.float64),
+        np.eye(3, dtype=np.float64).reshape(-1),
+        np.asarray(rgba, dtype=np.float32),
+    )
+    mujoco.mjv_connector(
+        geom,
+        mujoco.mjtGeom.mjGEOM_CAPSULE,
+        float(radius),
+        start,
+        end,
+    )
+    return True
+
+
+def object_hand_contact_part_index(
+    context: RetargetContext,
+    geom1: int,
+    geom2: int,
+) -> int | None:
+    part_index = context.contacts.object_geom_to_part.get(geom1)
+    link_index = context.contacts.hand_geom_to_link.get(geom2)
+    if part_index is not None and link_index is not None:
+        return part_index
+    part_index = context.contacts.object_geom_to_part.get(geom2)
+    link_index = context.contacts.hand_geom_to_link.get(geom1)
+    if part_index is not None and link_index is not None:
+        return part_index
+    return None
+
+
+def is_hand_self_contact(
+    context: RetargetContext,
+    geom1: int,
+    geom2: int,
+) -> bool:
+    return (
+        geom1 in context.contacts.hand_geom_to_link
+        and geom2 in context.contacts.hand_geom_to_link
+    )
+
+
+def draw_grouped_contact_points(
+    scene: Any,
+    contact_pos: np.ndarray | None,
+    contact_mask: np.ndarray | None,
+    radius: float,
+) -> int:
+    if contact_pos is None or contact_mask is None:
+        return 0
+    if contact_pos.shape[:2] != contact_mask.shape or contact_pos.shape[-1] != 3:
+        return 0
+
+    drawn = 0
+    for part_index, link_index in zip(*np.nonzero(contact_mask), strict=False):
+        rgba = contact_part_color(int(part_index), alpha=1.0)
+        if add_scene_sphere(
+            scene,
+            contact_pos[int(part_index), int(link_index)],
+            radius=radius,
+            rgba=rgba,
+        ):
+            drawn += 1
+    return drawn
+
+
+def draw_raw_contact_points(
+    context: RetargetContext,
+    data: mujoco.MjData,
+    scene: Any,
+    radius: float,
+    include_hand_self: bool,
+) -> int:
+    drawn = 0
+    for contact_index in range(data.ncon):
+        contact = data.contact[contact_index]
+        geom1 = int(contact.geom1)
+        geom2 = int(contact.geom2)
+        part_index = object_hand_contact_part_index(context, geom1, geom2)
+        if part_index is not None:
+            rgba = contact_part_color(part_index, alpha=1.0)
+        elif include_hand_self and is_hand_self_contact(context, geom1, geom2):
+            rgba = np.array([1.0, 0.95, 0.1, 1.0], dtype=np.float32)
+        else:
+            continue
+        if add_scene_sphere(
+            scene,
+            np.asarray(contact.pos, dtype=np.float64),
+            radius=radius,
+            rgba=rgba,
+        ):
+            drawn += 1
+    return drawn
+
+
+def draw_raw_contact_pair_lines(
+    context: RetargetContext,
+    data: mujoco.MjData,
+    scene: Any,
+    radius: float,
+    include_hand_self: bool,
+) -> int:
+    drawn = 0
+    for contact_index in range(data.ncon):
+        contact = data.contact[contact_index]
+        geom1 = int(contact.geom1)
+        geom2 = int(contact.geom2)
+        part_index = object_hand_contact_part_index(context, geom1, geom2)
+        if part_index is not None:
+            rgba = contact_part_color(part_index, alpha=0.55)
+        elif include_hand_self and is_hand_self_contact(context, geom1, geom2):
+            rgba = np.array([1.0, 0.95, 0.1, 0.45], dtype=np.float32)
+        else:
+            continue
+        if add_scene_capsule(
+            scene,
+            data.geom_xpos[geom1],
+            data.geom_xpos[geom2],
+            radius=radius,
+            rgba=rgba,
+        ):
+            drawn += 1
+    return drawn
+
+
+def draw_grouped_contact_pair_lines(
+    context: RetargetContext,
+    data: mujoco.MjData,
+    scene: Any,
+    contact_mask: np.ndarray | None,
+    radius: float,
+) -> int:
+    if contact_mask is None:
+        return 0
+
+    centers_part = part_centers(context, data)
+    centers_link = link_centers(context, data)
+    drawn = 0
+    for part_index, link_index in zip(*np.nonzero(contact_mask), strict=False):
+        part_index = int(part_index)
+        link_index = int(link_index)
+        if part_index >= centers_part.shape[0] or link_index >= centers_link.shape[0]:
+            continue
+        if context.contacts.part_geom_ids[part_index].size == 0:
+            continue
+        rgba = contact_part_color(part_index, alpha=0.4)
+        if add_scene_capsule(
+            scene,
+            centers_part[part_index],
+            centers_link[link_index],
+            radius=radius,
+            rgba=rgba,
+        ):
+            drawn += 1
+    return drawn
+
+
+def draw_contact_visualization(
+    context: RetargetContext,
+    data: mujoco.MjData,
+    scene: Any,
+    contact_pos: np.ndarray | None,
+    contact_mask: np.ndarray | None,
+    contact_visualization: Literal["points", "lines", "both"],
+    point_radius: float,
+    line_width: float,
+    include_hand_self: bool,
+) -> None:
+    if scene is None:
+        return
+
+    scene.ngeom = 0
+    if contact_visualization not in {"points", "lines", "both"}:
+        raise ValueError(
+            "contact_visualization must be one of `points`, `lines`, or `both`."
+        )
+
+    if contact_visualization in {"points", "both"}:
+        drawn_points = draw_grouped_contact_points(
+            scene,
+            contact_pos=contact_pos,
+            contact_mask=contact_mask,
+            radius=point_radius,
+        )
+        if drawn_points == 0:
+            draw_raw_contact_points(
+                context,
+                data,
+                scene,
+                radius=point_radius,
+                include_hand_self=include_hand_self,
+            )
+
+    if contact_visualization in {"lines", "both"}:
+        drawn_lines = draw_raw_contact_pair_lines(
+            context,
+            data,
+            scene,
+            radius=line_width,
+            include_hand_self=include_hand_self,
+        )
+        if drawn_lines == 0:
+            draw_grouped_contact_pair_lines(
+                context,
+                data,
+                scene,
+                contact_mask=contact_mask,
+                radius=line_width,
+            )
+
+
+def body_with_ancestors_and_descendants(
+    model: mujoco.MjModel,
+    body_id: int,
+) -> set[int]:
+    body_ids = descendants_of(model, body_id)
+    current = body_id
+    while current != 0:
+        body_ids.add(current)
+        current = int(model.body_parentid[current])
+    return body_ids
+
+
+def contact_visualization_geom_ids(context: RetargetContext) -> np.ndarray:
+    """Return all model geoms that should fade in the contact-focused view."""
+    model = context.model
+    body_ids: set[int] = set()
+    seed_geom_ids = set(context.contacts.object_geom_to_part) | set(
+        context.contacts.hand_geom_to_link
+    )
+    for geom_id in seed_geom_ids:
+        body_ids.update(
+            body_with_ancestors_and_descendants(
+                model,
+                int(model.geom_bodyid[geom_id]),
+            )
+        )
+
+    geom_ids = [
+        geom_id
+        for geom_id in range(model.ngeom)
+        if int(model.geom_bodyid[geom_id]) in body_ids
+    ]
+    return np.asarray(geom_ids, dtype=np.int64)
+
+
+def make_contact_view_context(
+    context: RetargetContext,
+    contact_view_alpha: float,
+) -> RetargetContext:
+    model = copy.copy(context.model)
+    alpha = float(np.clip(contact_view_alpha, 0.0, 1.0))
+    geom_ids = contact_visualization_geom_ids(context)
+    if geom_ids.size > 0:
+        model.geom_rgba[geom_ids, 3] = np.minimum(model.geom_rgba[geom_ids, 3], alpha)
+        mat_ids = np.unique(model.geom_matid[geom_ids])
+        mat_ids = mat_ids[mat_ids >= 0]
+        if mat_ids.size > 0:
+            model.mat_rgba[mat_ids, 3] = np.minimum(
+                model.mat_rgba[mat_ids, 3],
+                alpha,
+            )
+    return replace(context, model=model)
+
+
+def set_replay_frame(
+    model: mujoco.MjModel,
+    data: mujoco.MjData,
+    qpos: np.ndarray,
+) -> None:
+    data.qpos[:] = qpos
+    data.qvel[:] = 0.0
+    mujoco.mj_forward(model, data)
+
+
+def frame_contact_arrays(
+    frame_idx: int,
+    contact_pos: np.ndarray | None,
+    contact_mask: np.ndarray | None,
+) -> tuple[np.ndarray | None, np.ndarray | None]:
+    frame_contact_pos = None
+    frame_contact_mask = None
+    if contact_pos is not None and frame_idx < contact_pos.shape[0]:
+        frame_contact_pos = contact_pos[frame_idx]
+    if contact_mask is not None and frame_idx < contact_mask.shape[0]:
+        frame_contact_mask = contact_mask[frame_idx]
+    return frame_contact_pos, frame_contact_mask
+
+
+def sync_contact_viewer(
+    context: RetargetContext,
+    data: mujoco.MjData,
+    viewer: Any,
+    frame_idx: int,
+    qpos: np.ndarray,
+    contact_pos: np.ndarray | None,
+    contact_mask: np.ndarray | None,
+    contact_visualization: Literal["points", "lines", "both"],
+    contact_point_radius: float,
+    contact_line_width: float,
+    visualize_hand_self_contacts: bool,
+) -> None:
+    set_replay_frame(context.model, data, qpos[frame_idx])
+    frame_contact_pos, frame_contact_mask = frame_contact_arrays(
+        frame_idx,
+        contact_pos,
+        contact_mask,
+    )
+    draw_contact_visualization(
+        context,
+        data,
+        getattr(viewer, "user_scn", None),
+        contact_pos=frame_contact_pos,
+        contact_mask=frame_contact_mask,
+        contact_visualization=contact_visualization,
+        point_radius=contact_point_radius,
+        line_width=contact_line_width,
+        include_hand_self=visualize_hand_self_contacts,
+    )
+    viewer.sync()
+
+
 def write_h5(
     path: str,
     datasets: dict[str, np.ndarray],
@@ -1911,24 +2310,108 @@ def load_input_npz(path: str) -> tuple[np.ndarray, float, np.ndarray | None, np.
 
 
 def replay_viewer(
-    model: mujoco.MjModel,
+    context: RetargetContext,
     qpos: np.ndarray,
     fps: int,
+    visualize_contacts: bool,
+    contact_view_mode: Literal["overlay", "separate", "only"],
+    contact_view_alpha: float,
+    contact_pos: np.ndarray | None,
+    contact_mask: np.ndarray | None,
+    contact_visualization: Literal["points", "lines", "both"],
+    contact_point_radius: float,
+    contact_line_width: float,
+    visualize_hand_self_contacts: bool,
 ) -> None:
     try:
         from loop_rate_limiters import RateLimiter
     except ImportError:
         RateLimiter = None
 
-    data = mujoco.MjData(model)
+    model = context.model
+    show_contact_view = visualize_contacts and contact_view_mode in {"separate", "only"}
+    show_regular_view = not show_contact_view or contact_view_mode != "only"
+    draw_contacts_in_regular_view = visualize_contacts and contact_view_mode == "overlay"
+
+    data = mujoco.MjData(model) if show_regular_view else None
+    contact_context = (
+        make_contact_view_context(context, contact_view_alpha)
+        if show_contact_view
+        else None
+    )
+    contact_data = (
+        mujoco.MjData(contact_context.model)
+        if contact_context is not None
+        else None
+    )
     frame_idx = 0
     rate_limiter = RateLimiter(fps) if RateLimiter is not None else None
-    with mujoco.viewer.launch_passive(model, data) as viewer:
-        while viewer.is_running():
-            data.qpos[:] = qpos[frame_idx]
-            data.qvel[:] = 0.0
-            mujoco.mj_forward(model, data)
-            viewer.sync()
+
+    with ExitStack() as stack:
+        viewer = (
+            stack.enter_context(mujoco.viewer.launch_passive(model, data))
+            if data is not None
+            else None
+        )
+        contact_viewer = (
+            stack.enter_context(
+                mujoco.viewer.launch_passive(contact_context.model, contact_data)
+            )
+            if contact_context is not None and contact_data is not None
+            else None
+        )
+
+        def any_viewer_running() -> bool:
+            return any(
+                view is not None and view.is_running()
+                for view in (viewer, contact_viewer)
+            )
+
+        while any_viewer_running():
+            if viewer is not None and viewer.is_running() and data is not None:
+                set_replay_frame(model, data, qpos[frame_idx])
+                scene = getattr(viewer, "user_scn", None)
+                if draw_contacts_in_regular_view:
+                    frame_contact_pos, frame_contact_mask = frame_contact_arrays(
+                        frame_idx,
+                        contact_pos,
+                        contact_mask,
+                    )
+                    draw_contact_visualization(
+                        context,
+                        data,
+                        scene,
+                        contact_pos=frame_contact_pos,
+                        contact_mask=frame_contact_mask,
+                        contact_visualization=contact_visualization,
+                        point_radius=contact_point_radius,
+                        line_width=contact_line_width,
+                        include_hand_self=visualize_hand_self_contacts,
+                    )
+                elif scene is not None:
+                    scene.ngeom = 0
+                viewer.sync()
+
+            if (
+                contact_viewer is not None
+                and contact_viewer.is_running()
+                and contact_context is not None
+                and contact_data is not None
+            ):
+                sync_contact_viewer(
+                    contact_context,
+                    contact_data,
+                    contact_viewer,
+                    frame_idx,
+                    qpos,
+                    contact_pos,
+                    contact_mask,
+                    contact_visualization=contact_visualization,
+                    contact_point_radius=contact_point_radius,
+                    contact_line_width=contact_line_width,
+                    visualize_hand_self_contacts=visualize_hand_self_contacts,
+                )
+
             frame_idx = (frame_idx + 1) % qpos.shape[0]
             if rate_limiter is not None:
                 rate_limiter.sleep()
@@ -1985,6 +2468,13 @@ def main(
     use_ik_contact_fallback: bool = True,
     show_viewer: bool = True,
     viewer_fps: int = 60,
+    visualize_contacts: bool = True,
+    contact_view_mode: Literal["overlay", "separate", "only"] = "separate",
+    contact_view_alpha: float = 0.28,
+    contact_visualization: Literal["points", "lines", "both"] = "both",
+    contact_point_radius: float = 0.006,
+    contact_line_width: float = 0.0015,
+    visualize_hand_self_contacts: bool = False,
 ) -> str:
     dataset_dir = os.path.abspath(dataset_dir)
     processed_dir = get_processed_data_dir(
@@ -2481,7 +2971,20 @@ def main(
 
     if show_viewer:
         loguru.logger.info("Opening MuJoCo viewer for the final retargeted trajectory.")
-        replay_viewer(context.model, output_qpos, fps=viewer_fps)
+        replay_viewer(
+            context,
+            output_qpos,
+            fps=viewer_fps,
+            visualize_contacts=visualize_contacts,
+            contact_view_mode=contact_view_mode,
+            contact_view_alpha=contact_view_alpha,
+            contact_pos=output_contact_pos,
+            contact_mask=output_contact_mask,
+            contact_visualization=contact_visualization,
+            contact_point_radius=contact_point_radius,
+            contact_line_width=contact_line_width,
+            visualize_hand_self_contacts=visualize_hand_self_contacts,
+        )
 
     return output_path
 

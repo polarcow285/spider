@@ -397,6 +397,31 @@ def clip_joint_velocity(
     return velocity
 
 
+def match_frame_count(
+    name: str,
+    values: list | np.ndarray,
+    frame_count: int,
+) -> np.ndarray:
+    values = np.asarray(values)
+    if values.shape[0] == frame_count:
+        return values
+    if values.shape[0] == 0:
+        raise ValueError(f"{name} has no frames; expected {frame_count}.")
+    if values.shape[0] > frame_count:
+        loguru.logger.warning(
+            f"{name} has {values.shape[0]} frames; truncating to {frame_count}."
+        )
+        return values[:frame_count]
+
+    pad_count = frame_count - values.shape[0]
+    loguru.logger.warning(
+        f"{name} has {values.shape[0]} frames; padding {pad_count} "
+        f"final frame(s) to match input length {frame_count}."
+    )
+    padding = np.repeat(values[-1:], pad_count, axis=0)
+    return np.concatenate([values, padding], axis=0)
+
+
 # parameters
 def main(
     dataset_dir: str = f"{ROOT}/../example_datasets",
@@ -518,6 +543,8 @@ def main(
         axis=1,
     )
     qpos_ref[:, :, 2] += z_offset
+    input_frame_count = qpos_ref.shape[0]
+    loguru.logger.info(f"Loaded {input_frame_count} input frames from {file_path}.")
 
     # load model
     mj_model = mujoco.MjModel.from_xml_path(model_path)
@@ -787,6 +814,7 @@ def main(
     # dataset visualization rate so it does not look artificially slowed down.
     rate_limiter = RateLimiter(visualization_fps)
     H = qpos_finger_right.shape[0]
+    assert H == input_frame_count
     cnt = 0
     if save_video:
         import imageio
@@ -1071,7 +1099,17 @@ def main(
 
         file_dir = processed_dir_robot
         os.makedirs(file_dir, exist_ok=True)
+
+        # Save the visualized trajectory, preserving the selected input length.
+        qpos_list = match_frame_count("qpos", qpos_list, input_frame_count)
+        contact_pos_list = match_frame_count(
+            "contact_pos",
+            contact_pos_list,
+            input_frame_count,
+        )
+        contact_list = match_frame_count("contact", contact_list, input_frame_count)
         if save_video:
+            images = match_frame_count("video", images, input_frame_count)
             imageio.mimsave(
                 f"{file_dir}/visualization_ik.mp4",
                 images,
@@ -1081,17 +1119,7 @@ def main(
                 f"Saved visualization video to {file_dir}/visualization_ik.mp4"
             )
 
-        qpos_list = np.array(qpos_list)
-
-                # ============================================================
-        # Save EXACT trajectory that was visualized in MuJoCo viewer
-        # ============================================================
-
-        qpos_list = np.array(qpos_list)
-        contact_pos_list = np.array(contact_pos_list)
-        contact_list = np.array(contact_list)
-
-        H = qpos_list.shape[0]
+        H = input_frame_count
 
         # Compute qvel directly from the visualized trajectory. Keep frame 0 so
         # output length matches the input trajectory length.
@@ -1111,8 +1139,11 @@ def main(
         contact_save = contact_list
 
         assert qpos_save.shape[0] == qvel_list.shape[0]
+        assert qpos_save.shape[0] == input_frame_count
+        assert contact_pos_save.shape[0] == input_frame_count
+        assert contact_save.shape[0] == input_frame_count
 
-        out_npz = f"{file_dir}/trajectory_kinematic_mink.npz"
+        out_npz = f"{file_dir}/trajectory_kinematic_mink_{robot_type}_{task}.npz"
 
         np.savez(
             out_npz,
@@ -1124,7 +1155,7 @@ def main(
         )
 
         # Save identical rollout copy for compatibility
-        out_npz_rollout = f"{file_dir}/trajectory_ikrollout_mink.npz"
+        out_npz_rollout = f"{file_dir}/trajectory_ikrollout_{robot_type}_{task}.npz"
 
         np.savez(
             out_npz_rollout,
