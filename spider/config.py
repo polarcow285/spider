@@ -63,6 +63,9 @@ class Config:
     xy_offset_range: tuple[float, float] = (-0.005, 0.005)
     perturb_force: float = 0.0
     perturb_torque: float = 0.0
+    # When True (default), mjwp overwrites geom solref/solimp for stability at coarse sim_dt.
+    # Set False to keep XML contact parameters; use a small sim_dt (e.g. scene option timestep).
+    mjwp_override_geom_contact_sol: bool = True
 
     # === OPTIMIZER CONFIGURATION ===
     # Sampling parameters

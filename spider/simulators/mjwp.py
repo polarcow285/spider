@@ -74,35 +74,58 @@ def _compile_step(
 # --
 
 
+def apply_contact_solparams_to_collision_geoms(
+    model: mujoco.MjModel,
+    solref: tuple[float, float],
+    solimp: tuple[float, float, float, float, float],
+) -> None:
+    """Set solref/solimp on every geom that can collide.
+
+    MuJoCo's mjENBL_OVERRIDE is not supported by mujoco_warp.put_model, so we cannot
+    rely on opt.o_solref / opt.o_solimp. Writing geom_solref / geom_solimp matches
+    the intended softer contacts for larger sim_dt (XML scenes often use ~1 ms solref).
+    """
+    sr = np.array(solref, dtype=np.float64)
+    si = np.array(solimp, dtype=np.float64)
+    for gid in range(model.ngeom):
+        if model.geom_contype[gid] == 0 and model.geom_conaffinity[gid] == 0:
+            continue
+        model.geom_solref[gid] = sr
+        model.geom_solimp[gid] = si
+
+
 def setup_mj_model(config: Config) -> mujoco.MjModel:
     model_cpu = mujoco.MjModel.from_xml_path(config.model_path)
     model_cpu.opt.timestep = float(config.sim_dt)
+    override_contact = getattr(config, "mjwp_override_geom_contact_sol", True)
     if config.embodiment_type in ["left", "right", "bimanual"]:
-        # setup for hand
-        model_cpu.opt.iterations = 20
-        model_cpu.opt.ls_iterations = 50
-        model_cpu.opt.o_solref = [0.02, 1.0]
-        model_cpu.opt.o_solimp = [
-            0.0,
-            0.95,
-            0.03,
-            0.5,
-            2,
-        ]  # softer contact for sim2real
         model_cpu.opt.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
+        if override_contact:
+            model_cpu.opt.iterations = 40
+            model_cpu.opt.ls_iterations = 80
+            model_cpu.opt.o_solref = [0.04, 1.0]
+            model_cpu.opt.o_solimp = [0.45, 0.94, 0.02, 0.5, 2]
+            apply_contact_solparams_to_collision_geoms(
+                model_cpu,
+                (0.04, 1.0),
+                (0.45, 0.94, 0.02, 0.5, 2.0),
+            )
+        else:
+            model_cpu.opt.iterations = 20
+            model_cpu.opt.ls_iterations = 50
     elif config.embodiment_type in ["humanoid", "humanoid_object"]:
         # setup for humanoid
         model_cpu.opt.iterations = 5
         model_cpu.opt.ls_iterations = 10
-        model_cpu.opt.o_solref = [0.02, 1.0]
-        model_cpu.opt.o_solimp = [
-            0.9,
-            0.95,
-            0.001,
-            0.5,
-            2,
-        ]  # softer contact for sim2real
         model_cpu.opt.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
+        if override_contact:
+            model_cpu.opt.o_solref = [0.02, 1.0]
+            model_cpu.opt.o_solimp = [0.9, 0.95, 0.001, 0.5, 2]
+            apply_contact_solparams_to_collision_geoms(
+                model_cpu,
+                (0.02, 1.0),
+                (0.9, 0.95, 0.001, 0.5, 2.0),
+            )
     return model_cpu
 
 
@@ -278,6 +301,9 @@ def get_reward(
         config, qpos_sim, qpos_ref.unsqueeze(0).repeat(qpos_sim.shape[0], 1)
     )
     qpos_weight = _weight_diff_qpos(config)
+    # print(qpos_weight)
+    # print(qpos_diff)
+    # breakpoint()
     delta_qpos = qpos_diff * qpos_weight
     qpos_dist = torch.norm(delta_qpos, p=2, dim=1)
     qvel_dist = torch.norm(qvel_sim - qvel_ref, p=2, dim=1)
@@ -529,6 +555,8 @@ def step_env(config: Config, env: MJWPEnv, ctrl_mujoco: torch.Tensor):
     """Step all worlds with provided MuJoCo-format controls of shape (N, nu)."""
     if ctrl_mujoco.dim() == 1:
         ctrl_mujoco = ctrl_mujoco.unsqueeze(0).repeat(env.num_worlds, 1)
+    elif ctrl_mujoco.shape[0] == 1 and env.num_worlds > 1:
+        ctrl_mujoco = ctrl_mujoco.expand(env.num_worlds, -1)
     # Ensure we operate on the correct CUDA context/device
     with wp.ScopedDevice(env.device):
         # apply perturbation

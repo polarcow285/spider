@@ -3,16 +3,16 @@ defaults:
   - _self_
 
 # === TASK CONFIGURATION ===
-robot_type: leap
+robot_type: wuji
 embodiment_type: right
-task: scissors
+task: screwdriver
 # robot_type: xhand  # "inspire", "allegro", "g1", "xhand"
 # embodiment_type: bimanual # "left", "right", "bimanual", "CMU"
 # task: pick_spoon_bowl #screwdriver # pick_spoon_bowl
 
 # === DATASET CONFIGURATION ===
 dataset_dir: example_datasets
-dataset_name: arctic # oakink, custom
+dataset_name: custom # oakink, custom
 data_id: 0
 model_path: ""
 data_path: ""
@@ -20,17 +20,19 @@ data_path: ""
 # === SIMULATOR CONFIGURATION ===
 simulator: mjwp # "isaac" | "mujoco" | "mjwp" | "mjwp_cons" | "mjwp_eq" | "mjwp_cons_eq" | "kinematic"
 device: cuda:0
-# Simulation timing
-sim_dt: 0.01 # simulation timestep
+# Simulation timing (match scene.xml option timestep when mjwp_override_geom_contact_sol is false)
+sim_dt: 0.002 # 0.0008333333333333333
 ctrl_dt: 0.4 # control timestep
+# Keep authored geom solref/solimp; requires sim_dt small enough (see scene <option timestep=...>)
+mjwp_override_geom_contact_sol: false
 ref_dt: 0.02 # reference data timestep (1/50.0)
 render_dt: 0.02 # rendering timestep
-horizon: 2.0 # 1.6 # planning horizon
+horizon: 2.0 # planning horizon
 knot_dt: 0.4 # knot point spacing
 max_sim_steps: -1 # maximum simulation steps (-1 for unlimited)
 # Simulation constraints
-nconmax_per_env: 2100 # max contacts per environment
-njmax_per_env: 20500 # max joints per environment
+nconmax_per_env: 100 # max contacts per environment
+njmax_per_env: 500 # max joints per environment
 # Simulation annealing
 num_dyn: 1 # number of environments for annealing, used for virtual contact constraint
 # Domain randomization
@@ -44,11 +46,11 @@ perturb_torque: 0.0
 # Sampling parameters
 num_samples: 1024
 temperature: 0.1
-max_num_iterations: 32 # 32
-improvement_threshold: 0.01
+max_num_iterations: 32
+improvement_threshold: 0.001
 # Noise scheduling
-first_ctrl_noise_scale: 0.5
-last_ctrl_noise_scale: 1.0
+first_ctrl_noise_scale: 0.2  # 0.5
+last_ctrl_noise_scale: 0.5  # 1.0
 final_noise_scale: 0.1
 exploit_ratio: 0.01
 exploit_noise_scale: 0.01
@@ -57,13 +59,13 @@ joint_noise_scale: 0.3
 pos_noise_scale: 0.01
 rot_noise_scale: 0.03
 # Reward scaling
-base_pos_rew_scale: 1.0
-base_rot_rew_scale: 0.3
-joint_rew_scale: 0.003
-pos_rew_scale: 1.0 # 1.0
+base_pos_rew_scale: 0.001  # 1.0 # 0.1
+base_rot_rew_scale: 0.003  # 0.3 # 0.03
+joint_rew_scale: 0.003  # 0.003
+pos_rew_scale: 1.0  # 1.0
 rot_rew_scale: 0.3
-vel_rew_scale: 0.0001
-terminal_rew_scale: 1.0
+vel_rew_scale: 0.0  # 0.0001
+terminal_rew_scale: 1.0  # 1.0
 # Termination threshold
 terminate_resample: false
 object_pos_threshold: 0.1 # meters
@@ -71,7 +73,7 @@ object_rot_threshold: 0.3 # radians
 
 # === VISUALIZATION CONFIGURATION ===
 show_viewer: false
-viewer: rerun # "mujoco" | "rerun" | "isaac"
+viewer: rerun # "mujoco" | "rerun" | "viser" | "isaac"
 rerun_spawn: false
 save_video: true
 save_rerun: false
