@@ -59,8 +59,8 @@ joint_noise_scale: 0.3
 pos_noise_scale: 0.01
 rot_noise_scale: 0.03
 # Reward scaling
-base_pos_rew_scale: 0.01  # 1.0 # 0.1
-base_rot_rew_scale: 0.03  # 0.3 # 0.03
+base_pos_rew_scale: 0.001  # 1.0 # 0.1
+base_rot_rew_scale: 0.003  # 0.3 # 0.03
 joint_rew_scale: 0.003  # 0.003
 pos_rew_scale: 1.0  # 1.0
 rot_rew_scale: 0.3
