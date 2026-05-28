@@ -11,16 +11,16 @@
 #SBATCH --output=slurm_out/slurm-%j.out        # Standard output log file
 echo $HOSTNAME
 nvidia-smi
-python examples/eval_mjwp.py --seed 99 --csv-path mjwp_eval_results.csv \
+python examples/eval_mjwp.py --seed 0 --csv-path mjwp_eval_results.csv \
   robot_type=leap embodiment_type=right task=scissors \
   dataset_name=arctic data_id=0 --mink \
-  sim_dt=0.002 \
-  ctrl_dt=0.4 \
-  ref_dt=0.02 \
-  render_dt=0.02 \
-  horizon=2.0 \
-  knot_dt=0.4 \
-  num_samples=100 \
+  sim_dt=0.00208333333 \
+  ctrl_dt=0.66666666 \
+  ref_dt=0.033333333 \
+  render_dt=0.033333333 \
+  horizon=3.3333333 \
+  knot_dt=0.66666666 \
+  num_samples=2048 \
   first_ctrl_noise_scale=0.2 \
   last_ctrl_noise_scale=0.5 \
   base_pos_rew_scale=0.1 \
@@ -29,4 +29,4 @@ python examples/eval_mjwp.py --seed 99 --csv-path mjwp_eval_results.csv \
   pos_rew_scale=1.0 \
   rot_rew_scale=0.3 \
   vel_rew_scale=0.0 \
-  max_num_iterations=8
+  max_num_iterations=32

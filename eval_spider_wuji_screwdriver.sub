@@ -11,21 +11,21 @@
 #SBATCH --output=slurm_out/slurm-%j.out        # Standard output log file
 echo $HOSTNAME
 nvidia-smi
-python examples/eval_mjwp.py --seed 0 --csv-path mjwp_eval_results.csv \
+python examples/eval_mjwp.py --seed 4 --csv-path mjwp_eval_results.csv \
   robot_type=wuji embodiment_type=right task=screwdriver \
   dataset_name=custom data_id=0 --mink \
-  sim_dt=0.002 \
-  ctrl_dt=0.4 \
-  ref_dt=0.02 \
-  render_dt=0.02 \
-  horizon=2.0 \
-  knot_dt=0.4 \
+  sim_dt=0.00208333333 \
+  ctrl_dt=0.66666666 \
+  ref_dt=0.033333333 \
+  render_dt=0.033333333 \
+  horizon=3.3333333 \
+  knot_dt=0.66666666 \
   num_samples=4096 \
   first_ctrl_noise_scale=0.2 \
   last_ctrl_noise_scale=0.5 \
   base_pos_rew_scale=0.1 \
   base_rot_rew_scale=0.03 \
   joint_rew_scale=0.003 \
-  pos_rew_scale=1.0 \
-  rot_rew_scale=0.3 \
+  pos_rew_scale=3.0 \
+  rot_rew_scale=0.5 \
   vel_rew_scale=0.0 \

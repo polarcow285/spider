@@ -12,7 +12,7 @@
 echo $HOSTNAME
 nvidia-smi
 python examples/run_mjwp.py --mink \
-    seed=1
+    seed=0 \
     robot_type=wuji \
     embodiment_type=right \
     task=scissors \
@@ -24,4 +24,4 @@ python examples/run_mjwp.py --mink \
     pos_rew_scale=1.0 \
     rot_rew_scale=0.3 \
     max_num_iterations=4 \
-    num_samples=10 \
+    num_samples=100 \
