@@ -36,6 +36,7 @@ class Config:
     data_id: int = 0
     model_path: str = ""
     data_path: str = ""
+    seed: int | None = None
 
     # === SIMULATOR CONFIGURATION ===
     simulator: str = "isaac"  # "isaac" | "mujoco" | "mjwp" | "mjwp_cons" | "mjwp_eq" | "mjwp_cons_eq" | "kinematic"

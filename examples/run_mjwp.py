@@ -14,10 +14,12 @@ Date: 2025-08-11
 
 from __future__ import annotations
 
+import random
 import time
 from pathlib import Path
 
 import os
+import sys
 import hydra
 os.environ["MUJOCO_GL"] = "egl"
 import imageio
@@ -55,6 +57,23 @@ from spider.simulators.mjwp import (
 )
 from spider.viewers import render_image, setup_renderer, setup_viewer, update_viewer
 from spider.viewers.rerun_viewer import log_frame
+
+
+USE_MINK_DATA = "--mink" in sys.argv
+if USE_MINK_DATA:
+    sys.argv.remove("--mink")
+
+
+def seed_everything(seed: int | None) -> None:
+    """Seed Python, NumPy, and Torch when a seed is provided."""
+    if seed is None:
+        return
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    loguru.logger.info(f"Using seed {seed}")
 
 
 def _value_at_opt_step(info: dict, key: str) -> float:
@@ -116,6 +135,13 @@ def main(config: Config):
     """Run the SPIDER using MuJoCo Warp backend"""
     # process config, set defaults and derived fields
     config = process_config(config)
+    seed_everything(config.seed)
+    if USE_MINK_DATA:
+        config.data_path = str(
+            Path(config.data_path).with_name(
+                f"trajectory_kinematic_mink_{config.robot_type}_{config.task}.npz"
+            )
+        )
 
     # load reference data (already interpolated and extended)
     qpos_ref, qvel_ref, ctrl_ref, contact, contact_pos = load_data(
@@ -287,7 +313,7 @@ def main(config: Config):
 
         t_end = time.perf_counter()
         print(f"Total time: {t_end - t_start:.4f}s")
-    save_name = f"base_pos_rew_scale{config.base_pos_rew_scale}_base_rot_rew_scale{config.base_rot_rew_scale}_num_samples{config.num_samples}"
+    save_name = f"seed{config.seed}_sim_dt{config.sim_dt}_rot_rew_scale{config.rot_rew_scale}_pos_rew_scale{config.pos_rew_scale}_base_pos_rew_scale{config.base_pos_rew_scale}_base_rot_rew_scale{config.base_rot_rew_scale}_num_samples{config.num_samples}"
     # save retargeted trajectory
     if config.save_info and len(info_list) > 0:
         info_aggregated = {}

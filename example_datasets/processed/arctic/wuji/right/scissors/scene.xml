@@ -169,9 +169,9 @@
 
     <!-- Table: dexrl/objects/table.py TABLE_CFG (cuboid 0.7 x 0.7 x 0.4);
         center height from leap_screwdriver2_env_cfg: z = 0.502 - spawn.size[2]/2 = 0.302 -->
-    <body name="table" pos="0 0 0.474">
-    <geom name="table_geom" type="box" size="0.35 0.35 0.474" rgba="0.5 0.5 0.5 1" friction="1 0.005 0.0001"/>
-  </body>
+    <body name="table" pos="0 0 0.752">
+      <geom name="table_geom" type="box" size="0.35 0.35 0.2" rgba="0.5 0.5 0.5 1" friction="0.35 0.005 0.0001"/>
+    </body>
     <body name="ref_hand_right_thumb_tip" mocap="true">
       <site name="ref_hand_right_thumb_tip" pos="0 0 0" size="0.02" group="4" rgba="0 1 0 1"/>
     </body>
@@ -353,9 +353,9 @@
     <!-- Bottom link (base) -->
     <body name="bottom" pos="0 0 0" quat="1 0 0 0">
         <freejoint/>
-        <inertial pos="0.000041 0.053778 -0.000280"
-          mass="0.123329"
-          fullinertia="0.0001629 0.0000120 0.0001631 0.0000001 0.0000000 -0.0000000"/>
+          <inertial pos="-0.044610 -0.009283 0.002522"
+            mass="0.045393"
+            fullinertia="0.0000063 0.0000575 0.0000628 -0.0000050 -0.0000019 -0.0000007"/>
 
         <!-- <geom name="bottom_visual" type="mesh" mesh="bottom" material="obj_bottom_color" class="visual"/>
         <geom name="bottom_collision" type="mesh" mesh="bottom" material="obj_bottom_color"/> -->
@@ -379,9 +379,9 @@
 
         <!-- Top link (child) -->
         <body name="top" pos="0 0 0">
-            <inertial pos="-0.078084 0.032155 0.006335"
-                mass="0.338340"
-                fullinertia="0.0002697 0.0013638 0.0015968 0.0003930 0.0000951 -0.0000356"/>
+            <inertial pos="-0.039042 0.016078 0.003167"
+                mass="0.042293"
+                fullinertia="0.0000084 0.0000426 0.0000499 0.0000123 0.0000030 -0.0000011"/>
 
             <!-- <geom name="top_visual" type="mesh" mesh="top" material="obj_top_color" class="visual"/>
             <geom name="top_collision" type="mesh" mesh="top" material="obj_top_color"/> -->
@@ -409,7 +409,7 @@
 
             <!-- Revolute joint -->
             <joint name="scissors_joint" type="hinge" axis="0 0 -1"
-                    limited="true" range="0 2"/>
+                    limited="true" range="0 2" damping="0.0" frictionloss="0.2"/>
         </body>
     </body>
   </worldbody>
@@ -421,25 +421,25 @@
     <position name="right_rot_y_position" joint="right_rot_y" class="wrist_rotation" />
     <position name="right_rot_z_position" joint="right_rot_z" class="wrist_rotation" />
 
-    <position name="right_finger1_joint1_actuator" joint="right_finger1_joint1" kp="0.40844710645048043" kv="0.020882010257063675" ctrlrange="0.0475 1.6033" forcerange="-0.4452 0.4452" />
-    <position name="right_finger1_joint2_actuator" joint="right_finger1_joint2" kp="0.6858601063643346" kv="0.030610939996373314" ctrlrange="-0.1387 0.9324" forcerange="-0.4259 0.4259" />
-    <position name="right_finger1_joint3_actuator" joint="right_finger1_joint3" kp="0.2391112196099482" kv="0.010181475050560962" ctrlrange="-0.4642 1.5623" forcerange="-0.1888 0.1888" />
-    <position name="right_finger1_joint4_actuator" joint="right_finger1_joint4" kp="0.20736128319711747" kv="0.00909698844675045" ctrlrange="-0.4699 1.5568" forcerange="-0.1468 0.1468" />
-    <position name="right_finger2_joint1_actuator" joint="right_finger2_joint1" kp="0.37352218155860073" kv="0.01882274330029718" ctrlrange="-0.1585 1.5604" forcerange="-0.6188 0.6188" />
-    <position name="right_finger2_joint2_actuator" joint="right_finger2_joint2" kp="0.45592448909027794" kv="0.019798167597016643" ctrlrange="-0.37 0.37" forcerange="-0.1822 0.1822" />
-    <position name="right_finger2_joint3_actuator" joint="right_finger2_joint3" kp="0.24368366649522863" kv="0.010477031953162727" ctrlrange="-0.4777 1.5485" forcerange="-0.2251 0.2251" />
-    <position name="right_finger2_joint4_actuator" joint="right_finger2_joint4" kp="0.18026971340925335" kv="0.008240212147903584" ctrlrange="-0.4683 1.5753" forcerange="-0.217 0.217" />
-    <position name="right_finger3_joint1_actuator" joint="right_finger3_joint1" kp="0.3687093483646485" kv="0.01848622487024593" ctrlrange="-0.1644 1.5516" forcerange="-0.6494 0.6494" />
-    <position name="right_finger3_joint2_actuator" joint="right_finger3_joint2" kp="0.4164253443634641" kv="0.018032947229953678" ctrlrange="-0.37 0.37" forcerange="-0.1827 0.1827" />
-    <position name="right_finger3_joint3_actuator" joint="right_finger3_joint3" kp="0.22218607502059182" kv="0.009592200014076666" ctrlrange="-0.4739 1.5512" forcerange="-0.2078 0.2078" />
-    <position name="right_finger3_joint4_actuator" joint="right_finger3_joint4" kp="0.19427606072023446" kv="0.009152994605972402" ctrlrange="-0.4684 1.5745" forcerange="-0.2018 0.2018" />
-    <position name="right_finger4_joint1_actuator" joint="right_finger4_joint1" kp="0.35718151495111794" kv="0.018376606800780005" ctrlrange="-0.1554 1.5585" forcerange="-0.6389 0.6389" />
-    <position name="right_finger4_joint2_actuator" joint="right_finger4_joint2" kp="0.42977315313086895" kv="0.01867700966212433" ctrlrange="-0.37 0.37" forcerange="-0.1832 0.1832" />
-    <position name="right_finger4_joint3_actuator" joint="right_finger4_joint3" kp="0.24930151196247122" kv="0.01059512121009555" ctrlrange="-0.4765 1.5487" forcerange="-0.2249 0.2249" />
-    <position name="right_finger4_joint4_actuator" joint="right_finger4_joint4" kp="0.2285032688178066" kv="0.009917602877441107" ctrlrange="-0.4777 1.5634" forcerange="-0.2044 0.2044" />
-    <position name="right_finger5_joint1_actuator" joint="right_finger5_joint1" kp="0.3655325975433942" kv="0.018616960278988272" ctrlrange="-0.1626 1.5585" forcerange="-0.6441 0.6441" />
-    <position name="right_finger5_joint2_actuator" joint="right_finger5_joint2" kp="0.41393113081120425" kv="0.018732177029667153" ctrlrange="-0.37 0.37" forcerange="-0.1798 0.1798" />
-    <position name="right_finger5_joint3_actuator" joint="right_finger5_joint3" kp="0.22729367621965954" kv="0.00951005441616486" ctrlrange="-0.4768 1.549" forcerange="-0.2384 0.2384" />
-    <position name="right_finger5_joint4_actuator" joint="right_finger5_joint4" kp="0.1964723550341816" kv="0.009017295241756363" ctrlrange="-0.4683 1.5735" forcerange="-0.1866 0.1866" />
+    <position name="right_finger1_joint1_actuator" joint="right_finger1_joint1" kp="163.3788426" kv="8.352804103" ctrlrange="0.0475 1.6033" />
+    <position name="right_finger1_joint2_actuator" joint="right_finger1_joint2" kp="274.3440425" kv="12.244376" ctrlrange="-0.1387 0.9324" />
+    <position name="right_finger1_joint3_actuator" joint="right_finger1_joint3" kp="95.64448784" kv="4.07259002" ctrlrange="-0.4642 1.5623" />
+    <position name="right_finger1_joint4_actuator" joint="right_finger1_joint4" kp="82.94451328" kv="3.638795379" ctrlrange="-0.4699 1.5568" />
+    <position name="right_finger2_joint1_actuator" joint="right_finger2_joint1" kp="149.4088726" kv="7.52909732" ctrlrange="-0.1585 1.5604" />
+    <position name="right_finger2_joint2_actuator" joint="right_finger2_joint2" kp="182.3697956" kv="7.919267039" ctrlrange="-0.37 0.37" />
+    <position name="right_finger2_joint3_actuator" joint="right_finger2_joint3" kp="97.4734666" kv="4.190812781" ctrlrange="-0.4777 1.5485" />
+    <position name="right_finger2_joint4_actuator" joint="right_finger2_joint4" kp="72.10788536" kv="3.296084859" ctrlrange="-0.4683 1.5753" />
+    <position name="right_finger3_joint1_actuator" joint="right_finger3_joint1" kp="147.4837393" kv="7.394489948" ctrlrange="-0.1644 1.5516" />
+    <position name="right_finger3_joint2_actuator" joint="right_finger3_joint2" kp="166.5701377" kv="7.213178892" ctrlrange="-0.37 0.37" />
+    <position name="right_finger3_joint3_actuator" joint="right_finger3_joint3" kp="88.87443001" kv="3.836880006" ctrlrange="-0.4739 1.5512" />
+    <position name="right_finger3_joint4_actuator" joint="right_finger3_joint4" kp="77.71042429" kv="3.661197842" ctrlrange="-0.4684 1.5745" />
+    <position name="right_finger4_joint1_actuator" joint="right_finger4_joint1" kp="142.872606" kv="7.35064272" ctrlrange="-0.1554 1.5585" />
+    <position name="right_finger4_joint2_actuator" joint="right_finger4_joint2" kp="171.9092613" kv="7.470803865" ctrlrange="-0.37 0.37" />
+    <position name="right_finger4_joint3_actuator" joint="right_finger4_joint3" kp="99.72060478" kv="4.238048484" ctrlrange="-0.4765 1.5487" />
+    <position name="right_finger4_joint4_actuator" joint="right_finger4_joint4" kp="91.40130753" kv="3.967041151" ctrlrange="-0.4777 1.5634" />
+    <position name="right_finger5_joint1_actuator" joint="right_finger5_joint1" kp="146.213039" kv="7.446784112" ctrlrange="-0.1626 1.5585" />
+    <position name="right_finger5_joint2_actuator" joint="right_finger5_joint2" kp="165.5724523" kv="7.492870812" ctrlrange="-0.37 0.37" />
+    <position name="right_finger5_joint3_actuator" joint="right_finger5_joint3" kp="90.91747049" kv="3.804021766" ctrlrange="-0.4768 1.549" />
+    <position name="right_finger5_joint4_actuator" joint="right_finger5_joint4" kp="78.58894201" kv="3.606918097" ctrlrange="-0.4683 1.5735" />
   </actuator>
 </mujoco>

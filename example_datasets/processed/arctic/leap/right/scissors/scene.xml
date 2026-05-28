@@ -68,7 +68,7 @@
   <!-- defaults -->
   <default>
     <!-- constraint stiffness -->
-    <geom solimp="0.99 0.999 0.01 0.001 1" solref="0.001 1" friction=".2"/>
+   <geom solimp="0.99 0.999 0.01 0.001 1" solref="0.001 1"/>
 
     <!-- actuator defaults (align finger position PD with leaphand_screwdriver sim2sim MJCF) -->
     <position kp="3.0" kv="0.1" />
