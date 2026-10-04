@@ -17,8 +17,8 @@ Keys: ['qpos_wrist_right', 'qpos_finger_right', 'qpos_wrist_left', 'qpos_finger_
     qpos_obj_right: shape=(T, 7), dtype=float32
 
 Example usage:
-    python spider/process_datasets/custom.py --task screwdriver --embodiment-type right --target-robot-type wuji --dataset-dir example_datasets
-    python spider/process_datasets/custom.py --task screwdriver --embodiment-type right --target-robot-type leap --dataset-dir example_datasets
+    python spider/process_datasets/custom.py --task hammer --embodiment-type right --dataset-dir example_datasets
+    python spider/process_datasets/custom.py --task screwdriver --scale 1.5 --embodiment-type right --dataset-dir example_datasets
 
 """
 import json
@@ -35,36 +35,47 @@ import mujoco.viewer
 from loop_rate_limiters import RateLimiter
 from spider.io import get_processed_data_dir
 
+# visual mesh per object, relative to processed/custom/assets/objects; None -> box primitive
+OBJECT_MESHES = {
+    "screwdriver": "screwdriver/screwdriver.obj",
+    "hammer": "hammer/hammer_simplified/hammer_simplified.obj",
+    "eraser": None,
+}
+ERASER_BOX_HALF_SIZE = [0.025, 0.0625, 0.015]  # from regrind assets/eraser/eraser.xml
+
 def main(
     dataset_dir: str = "../../example_datasets",
     embodiment_type: str = "bimanual",
     task: str = "pick_spoon_bowl",
-    robot_type: str = "leap",
+    robot_type: str | None = None,  # set only if a robot needs its own demo
+    scale: float = 1.0,  # e.g. 1.5 -> raw/custom/screwdriver_1_5x
     show_viewer: bool = True,
     save_video: bool = False,
     start_idx: int = 0,
 ):
     dataset_dir = os.path.abspath(dataset_dir)
-    # file_path = f"{dataset_dir}/raw/custom/{task}_{embodiment_type}.h5"
-    file_path = f"{dataset_dir}/raw/custom/demo_{robot_type}.h5"
+    scale_suffix = "" if scale == 1.0 else f"_{scale:g}x".replace(".", "_")
+    variant = f"{task}{scale_suffix}"
+    file_path = f"{dataset_dir}/raw/custom/{variant}/demo_30fps.h5"
     output_dir = get_processed_data_dir(
         dataset_dir=dataset_dir,
         dataset_name="custom",
         robot_type="mano",
         embodiment_type=embodiment_type,
-        task=task,
+        task=variant,
         data_id=0,
     )
     os.makedirs(output_dir, exist_ok=True)
 
     # task info
+    mesh_rel = OBJECT_MESHES[task]
     right_object_mesh_dir = os.path.join(
         dataset_dir,
         "processed",
         "custom",
         "assets",
         "objects",
-        "screwdriver",
+        task,
     )
     task_info = {
         "task": task,
@@ -107,8 +118,9 @@ def main(
     # ---- Object (right) ----
     qpos_obj_right = np.concatenate([obj_pos, obj_quat], axis=1).astype(np.float32)  # (T, 7)
 
+    keypoints_name = "trajectory_keypoints.npz" if robot_type is None else f"trajectory_keypoints_{robot_type}.npz"
     np.savez(
-        f"{output_dir}/trajectory_keypoints_{robot_type}.npz",
+        f"{output_dir}/{keypoints_name}",
         qpos_wrist_right=qpos_wrist_right[start_idx:],
         qpos_finger_right=qpos_finger_right[start_idx:],
         qpos_obj_right=qpos_obj_right[start_idx:],
@@ -116,7 +128,7 @@ def main(
         qpos_finger_left=qpos_finger_left[start_idx:],
         qpos_obj_left=qpos_obj_left[start_idx:],
     )
-    loguru.logger.info(f"Saved qpos to {output_dir}/trajectory_keypoints_{robot_type}.npz")
+    loguru.logger.info(f"Saved qpos to {output_dir}/{keypoints_name}")
 
     task_info_path = f"{output_dir}/../task_info.json"
     with open(task_info_path, "w") as f:
@@ -150,19 +162,29 @@ def main(
     )
 
     if embodiment_type in ["right", "bimanual"]:
-        mj_spec.add_mesh(
-            name="right_object",
-            file=os.path.join(right_object_mesh_dir, "screwdriver.obj"),
-        )
-        object_right_handle.add_geom(
-            name="right_object",
-            type=mujoco.mjtGeom.mjGEOM_MESH,
-            meshname="right_object",
-            pos=[0, 0, 0],
-            quat=[1, 0, 0, 0],
-            group=0,
-            condim=1,
-        )
+        if mesh_rel is None:
+            object_right_handle.add_geom(
+                name="right_object",
+                type=mujoco.mjtGeom.mjGEOM_BOX,
+                size=[s * scale for s in ERASER_BOX_HALF_SIZE],
+                group=0,
+                condim=1,
+            )
+        else:
+            mj_spec.add_mesh(
+                name="right_object",
+                file=os.path.join(dataset_dir, "processed", "custom", "assets", "objects", mesh_rel),
+                scale=[scale] * 3,
+            )
+            object_right_handle.add_geom(
+                name="right_object",
+                type=mujoco.mjtGeom.mjGEOM_MESH,
+                meshname="right_object",
+                pos=[0, 0, 0],
+                quat=[1, 0, 0, 0],
+                group=0,
+                condim=1,
+            )
     # add left object to body "left_object"
     object_left_handle = mj_spec.worldbody.add_body(
         name="left_object",

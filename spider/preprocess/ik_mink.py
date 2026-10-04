@@ -35,7 +35,7 @@ from scipy import signal
 
 from spider import ROOT
 from spider.io import get_processed_data_dir
-from spider.mujoco_utils import get_viewer
+from spider.mujoco_utils import compute_table_z_offset, get_viewer
 
 
 LEAP_NO_BACKBEND_JOINTS = {
@@ -448,7 +448,7 @@ def main(
     max_num_initial_guess: int = 8,
     average_frame_size: int = 3,
     aggregate_contact: bool = True,
-    z_offset: float = 0.0,
+    z_offset: float | None = None,  # None -> rest the object on the scene table at the first frame
     posture_cost: float = 1.0,
     wrist_position_cost: float = 50.0,
     wrist_orientation_cost: float = 10.0,
@@ -489,6 +489,8 @@ def main(
     sites_in_robot = get_robot_sites(robot_type, embodiment_type)
 
     file_path = f"{processed_dir_mano}/trajectory_keypoints_{robot_type}.npz"
+    if not os.path.exists(file_path):
+        file_path = f"{processed_dir_mano}/trajectory_keypoints.npz"
     loaded_data = np.load(file_path)
     frame_slice = slice(start_idx, None if end_idx < 0 else end_idx)
     qpos_finger_right = loaded_data["qpos_finger_right"][frame_slice]
@@ -542,6 +544,9 @@ def main(
         ],
         axis=1,
     )
+    if z_offset is None:
+        z_offset = compute_table_z_offset(model_path, qpos_obj_right[0])
+        loguru.logger.info(f"auto z_offset = {z_offset:.3f} (object resting on table)")
     qpos_ref[:, :, 2] += z_offset
     input_frame_count = qpos_ref.shape[0]
     loguru.logger.info(f"Loaded {input_frame_count} input frames from {file_path}.")

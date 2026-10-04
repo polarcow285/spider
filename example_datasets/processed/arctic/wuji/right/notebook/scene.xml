@@ -17,8 +17,8 @@
       <position kp="1000" kv="100" ctrlrange="-0.5 0.5" />
     </default>
     <default class="wrist_vertical_translation">
-      <joint limited="true" range="0 1" />
-      <position kp="1000" kv="100" ctrlrange="0 1" />
+      <joint limited="true" range="0 1.5" />
+      <position kp="1000" kv="100" ctrlrange="0 1.5" />
     </default>
     <default class="wrist_rotation">
       <joint limited="true" range="-3.14 3.14" />
@@ -140,9 +140,9 @@
 
     <!-- Table: dexrl/objects/table.py TABLE_CFG (cuboid 0.7 x 0.7 x 0.4);
         center height from leap_screwdriver2_env_cfg: z = 0.502 - spawn.size[2]/2 = 0.302 -->
-    <!-- <body name="table" pos="0 0 0.30">
+    <body name="table" pos="0 0 0.758">
         <geom name="table_geom" type="box" size="0.35 0.35 0.2" rgba="0.5 0.5 0.5 1" friction="1 0.005 0.0001"/>
-    </body> -->
+    </body>
     <!-- <body name="table" pos="0 0 -0.19">
         <geom name="table_geom" type="box" size="0.35 0.35 0.2" rgba="0.5 0.5 0.5 1" friction="1 0.005 0.0001"/>
     </body> -->

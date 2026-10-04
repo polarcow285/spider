@@ -5,7 +5,7 @@ defaults:
 # === TASK CONFIGURATION ===
 robot_type: wuji
 embodiment_type: right
-task: screwdriver
+task: eraser
 # robot_type: xhand  # "inspire", "allegro", "g1", "xhand"
 # embodiment_type: bimanual # "left", "right", "bimanual", "CMU"
 # task: pick_spoon_bowl #screwdriver # pick_spoon_bowl

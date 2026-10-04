@@ -28,7 +28,7 @@ from scipy import signal
 
 from spider import ROOT
 from spider.io import get_processed_data_dir
-from spider.mujoco_utils import get_viewer
+from spider.mujoco_utils import compute_table_z_offset, get_viewer
 
 
 def add_mocap_bodies(
@@ -218,7 +218,7 @@ def main(
     max_num_initial_guess: int = 8,
     average_frame_size: int = 3,
     aggregate_contact: bool = True,
-    z_offset: float = 0.0,
+    z_offset: float | None = None,  # None -> rest the object on the scene table at the first frame
 ):
     # resolved processed directories
     dataset_dir = os.path.abspath(dataset_dir)
@@ -246,6 +246,8 @@ def main(
     sites_in_robot = get_robot_sites(robot_type, embodiment_type)
 
     file_path = f"{processed_dir_mano}/trajectory_keypoints_{robot_type}.npz"
+    if not os.path.exists(file_path):
+        file_path = f"{processed_dir_mano}/trajectory_keypoints.npz"
     loaded_data = np.load(file_path)
     qpos_finger_right = loaded_data["qpos_finger_right"][start_idx:end_idx]
     qpos_finger_left = loaded_data["qpos_finger_left"][start_idx:end_idx]
@@ -293,6 +295,9 @@ def main(
         ],
         axis=1,
     )
+    if z_offset is None:
+        z_offset = compute_table_z_offset(model_path, qpos_obj_right[0])
+        loguru.logger.info(f"auto z_offset = {z_offset:.3f} (object resting on table)")
     qpos_ref[:, :, 2] += z_offset
 
     # load model
@@ -483,7 +488,13 @@ def main(
         jnt_adr = mj_model.body_jntadr[j_obj]
         mj_data_ik.qpos[jnt_adr:jnt_adr+7] = qpos_obj_right[0]
 
-        scissors_hinge_jid = mujoco.mj_name2id(mj_model_ik, mujoco.mjtObj.mjOBJ_JOINT, "scissors_joint")
+        # hinge is "scissors_joint" in scissors scenes, "rotation" in notebook scenes
+        for hinge_name in ["scissors_joint", "rotation"]:
+            scissors_hinge_jid = mujoco.mj_name2id(mj_model_ik, mujoco.mjtObj.mjOBJ_JOINT, hinge_name)
+            if scissors_hinge_jid != -1:
+                break
+        else:
+            raise ValueError(f"No object hinge joint ('scissors_joint' or 'rotation') in {model_path}")
         scissors_hinge_qadr = mj_model_ik.jnt_qposadr[scissors_hinge_jid]
 
         mj_data_ik.qpos[scissors_hinge_qadr] = obj_arti[0, 0]

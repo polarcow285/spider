@@ -1,0 +1,10 @@
+{
+  "task": "hammer",
+  "dataset_name": "custom",
+  "robot_type": "mano",
+  "embodiment_type": "right",
+  "data_id": 0,
+  "right_object_mesh_dir": "/home/nl455/Code/spider/example_datasets/processed/custom/assets/objects/hammer",
+  "left_object_mesh_dir": null,
+  "ref_dt": 0.02
+}

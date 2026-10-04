@@ -32,12 +32,16 @@ Keys: ['qpos_wrist_right', 'qpos_finger_right', 'qpos_wrist_left', 'qpos_finger_
     qpos_obj_right: shape=(T, 7), dtype=float32
     qpos_obj_arti: shape (T, 1), dtype=float32
 
-Example usage: python spider/process_datasets/arctic.py --task scissors --embodiment-type right --dataset-dir example_datasets
+Example usage:
+    python spider/process_datasets/arctic.py --task notebook --embodiment-type right --dataset-dir example_datasets
+    python spider/process_datasets/arctic.py --task scissors --scale 2 --embodiment-type right --dataset-dir example_datasets
 
 """
 import io
 import json
 import os
+from contextlib import contextmanager
+
 import h5py
 import numpy as np
 import tyro
@@ -49,24 +53,32 @@ from loop_rate_limiters import RateLimiter
 from spider.io import get_processed_data_dir
 from scipy.spatial.transform import Rotation as R
 
+# hinged object meshes, relative to processed/arctic/assets/objects
+ARCTIC_OBJECTS = {
+    "scissors": {"top": "scissors/top.obj", "bottom": "scissors/bottom.obj", "mesh_scale": 0.001, "hinge_range": [0, 0.5]},
+    "notebook": {"top": "notebook/top_watertight_tiny.obj", "bottom": "notebook/bottom_watertight_tiny.obj", "mesh_scale": 1.0, "hinge_range": [0, np.pi]},
+}
+
 def main(
     dataset_dir: str = "../../example_datasets",
     embodiment_type: str = "bimanual",
     task: str = "pick_spoon_bowl",
-    robot_type: str = "leap",
+    robot_type: str | None = None,  # set only if a robot needs its own demo
+    scale: float = 1.0,  # e.g. 2 -> raw/arctic/scissors_2x
     show_viewer: bool = True,
     save_video: bool = False,
     start_idx: int = 0,
 ):
     dataset_dir = os.path.abspath(dataset_dir)
-    # file_path = f"{dataset_dir}/raw/custom/{task}_{embodiment_type}.h5"
-    file_path = f"{dataset_dir}/raw/arctic/demo_{robot_type}.h5"
+    scale_suffix = "" if scale == 1.0 else f"_{scale:g}x".replace(".", "_")
+    variant = f"{task}{scale_suffix}"
+    file_path = f"{dataset_dir}/raw/arctic/{variant}/demo_30fps.h5"
     output_dir = get_processed_data_dir(
         dataset_dir=dataset_dir,
         dataset_name="arctic",
         robot_type="mano",
         embodiment_type=embodiment_type,
-        task=task,
+        task=variant,
         data_id=0,
     )
     os.makedirs(output_dir, exist_ok=True)
@@ -108,8 +120,9 @@ def main(
     # ---- Object (right) ----
     qpos_obj_right = np.concatenate([obj_pos, obj_quat], axis=1).astype(np.float32)  # (T, 7)
 
+    keypoints_name = "trajectory_keypoints.npz" if robot_type is None else f"trajectory_keypoints_{robot_type}.npz"
     np.savez(
-        f"{output_dir}/trajectory_keypoints_{robot_type}.npz",
+        f"{output_dir}/{keypoints_name}",
         qpos_wrist_right=qpos_wrist_right[start_idx:],
         qpos_finger_right=qpos_finger_right[start_idx:],
         qpos_obj_right=qpos_obj_right[start_idx:],
@@ -118,7 +131,7 @@ def main(
         qpos_obj_left=qpos_obj_left[start_idx:],
         obj_arti=obj_arti[start_idx:],
     )
-    loguru.logger.info(f"Saved qpos to {output_dir}/trajectory_keypoints_{robot_type}.npz")
+    loguru.logger.info(f"Saved qpos to {output_dir}/{keypoints_name}")
 
     qpos_list = np.concatenate(
         [
@@ -146,31 +159,12 @@ def main(
         group=0,
     )
 
+    obj_cfg = ARCTIC_OBJECTS[task]
     if embodiment_type in ["right", "bimanual"]:
-        top_mesh_path = os.path.join(
-            dataset_dir,
-            "processed",
-            "arctic",
-            "assets",
-            "objects",
-            "scissors",
-            "top.obj",
-        )
-
-        bottom_mesh_path = os.path.join(
-            dataset_dir,
-            "processed",
-            "arctic",
-            "assets",
-            "objects",
-            "scissors",
-            "bottom.obj",
-        )
-
-        if robot_type == "wuji":
-            mesh_scale = [0.001, 0.001, 0.001]
-        else:
-            mesh_scale = [0.002, 0.002, 0.002]
+        objects_dir = os.path.join(dataset_dir, "processed", "arctic", "assets", "objects")
+        top_mesh_path = os.path.join(objects_dir, obj_cfg["top"])
+        bottom_mesh_path = os.path.join(objects_dir, obj_cfg["bottom"])
+        mesh_scale = [obj_cfg["mesh_scale"] * scale] * 3
 
         mj_spec.add_mesh(
             name="scissors_top",
@@ -221,7 +215,7 @@ def main(
             type=mujoco.mjtJoint.mjJNT_HINGE,
             axis=[0, 0, -1],   # adjust axis
             pos=[0, 0, 0],    # hinge pivot
-            range=[0, 0.5],
+            range=obj_cfg["hinge_range"],
         )
 
         scissors_top.add_geom(
