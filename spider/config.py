@@ -99,6 +99,7 @@ class Config:
     joint_rew_scale: float = 0.003
     pos_rew_scale: float = 1.0
     rot_rew_scale: float = 0.1
+    object_joint_rew_scale: float = 1.0  # articulated object joints, e.g. a hinge
     vel_rew_scale: float = 0.0001
     terminal_rew_scale: float = 1.0
 
@@ -237,12 +238,20 @@ def process_config(config: Config):
     config.data_path = f"{processed_dir_robot}/trajectory_kinematic.npz"
 
     # get model data
-    if config.simulator == "mjwp":
+    model = None
+    if config.simulator == "mjwp" or (
+        config.embodiment_type in ["right", "left"]
+        and os.path.exists(config.model_path)
+    ):
         model = mujoco.MjModel.from_xml_path(config.model_path)
+    if config.simulator == "mjwp":
         config.nq = model.nq
         config.nv = model.nv
         config.nu = model.nu
         config.npair = model.npair
+    if model is not None and config.embodiment_type in ["right", "left"]:
+        # object free joint plus any articulated object joints (e.g. a hinge)
+        config.nq_obj = model.nq - model.nu
 
     # get noise scale
     config = compute_noise_schedule(config)

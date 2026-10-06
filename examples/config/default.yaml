@@ -65,6 +65,7 @@ base_rot_rew_scale: 0.03  # 0.3
 joint_rew_scale: 0.003  # 0.003
 pos_rew_scale: 3.0  # 1.0
 rot_rew_scale: 0.5  # 0.3
+object_joint_rew_scale: 1.0 # articulated object joints, e.g. scissors/notebook hinge
 vel_rew_scale: 0.0001
 terminal_rew_scale: 1.0  # 1.0
 # Termination threshold

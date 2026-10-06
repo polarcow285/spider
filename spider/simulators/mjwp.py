@@ -210,8 +210,11 @@ def _weight_diff_qpos(config: Config) -> torch.Tensor:
         w[:3] = config.base_pos_rew_scale
         w[3:6] = config.base_rot_rew_scale
         w[6 : config.nu] = config.joint_rew_scale
-        w[-6:-3] = config.pos_rew_scale
-        w[-3:] = config.rot_rew_scale
+        # object free joint follows the robot, then any articulated object joints
+        n = config.nu
+        w[n : n + 3] = config.pos_rew_scale
+        w[n + 3 : n + 6] = config.rot_rew_scale
+        w[n + 6 :] = config.object_joint_rew_scale
     elif config.embodiment_type in ["humanoid"]:  # humanoid robot
         # robot pos and rot
         w[:3] = config.pos_rew_scale
@@ -250,12 +253,17 @@ def _diff_qpos(
         qpos_diff[:, -9:-6] = quat_sub(qpos_sim[:, -11:-7], qpos_ref[:, -11:-7])
         qpos_diff[:, -3:] = quat_sub(qpos_sim[:, -4:], qpos_ref[:, -4:])
     elif config.embodiment_type in ["right", "left"]:
-        # joint
-        qpos_diff[:, :-6] = qpos_sim[:, :-7] - qpos_ref[:, :-7]
-        # position
-        qpos_diff[:, -6:-3] = qpos_sim[:, -7:-4] - qpos_ref[:, -7:-4]
-        # rotation
-        qpos_diff[:, -3:] = quat_sub(qpos_sim[:, -4:], qpos_ref[:, -4:])
+        n = config.nu
+        # robot joint
+        qpos_diff[:, :n] = qpos_sim[:, :n] - qpos_ref[:, :n]
+        # object position
+        qpos_diff[:, n : n + 3] = qpos_sim[:, n : n + 3] - qpos_ref[:, n : n + 3]
+        # object rotation
+        qpos_diff[:, n + 3 : n + 6] = quat_sub(
+            qpos_sim[:, n + 3 : n + 7], qpos_ref[:, n + 3 : n + 7]
+        )
+        # articulated object joints (e.g. a hinge), if any
+        qpos_diff[:, n + 6 :] = qpos_sim[:, n + 7 :] - qpos_ref[:, n + 7 :]
     elif config.embodiment_type in ["humanoid"]:
         # joint
         qpos_diff[:, 6:] = qpos_sim[:, 7:] - qpos_ref[:, 7:]
@@ -394,11 +402,12 @@ def get_terminate(
             | (right_obj_quat_error > config.object_rot_threshold)
         )
     elif config.embodiment_type in ["right", "left"]:
-        obj_pos = qpos_sim[:, -7:-4]
-        obj_pos_ref = qpos_ref[-7:-4].unsqueeze(0)
+        n = config.nu
+        obj_pos = qpos_sim[:, n : n + 3]
+        obj_pos_ref = qpos_ref[n : n + 3].unsqueeze(0)
         obj_pos_error = torch.norm(obj_pos - obj_pos_ref, p=2, dim=1)
-        obj_quat = qpos_sim[:, -4:]
-        obj_quat_ref = qpos_ref[-4:].unsqueeze(0)
+        obj_quat = qpos_sim[:, n + 3 : n + 7]
+        obj_quat_ref = qpos_ref[n + 3 : n + 7].unsqueeze(0)
         obj_quat_error = torch.norm(
             quat_sub(obj_quat, obj_quat_ref.repeat(qpos_sim.shape[0], 1)), p=2, dim=1
         )
